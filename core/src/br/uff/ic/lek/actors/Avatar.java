@@ -421,12 +421,27 @@ public class Avatar extends Sprite {
     }
 
     public PlayerData getFirebaseData(){
-        PlayerData pd = PlayerData.myPlayerData();// singleton
+        PlayerData pd = PlayerData.myPlayerData();
         pd.setAuthUID(this.authUID);
         pd.setWriterUID(this.authUID);
         pd.setGameState(PlayerData.States.READYTOPLAY);
-        pd.setChat("empty"); // LEK todo: mudar para uma constante melhor
-        pd.setCmd("{cmd:READYTOPLAY,px:"+ Float.toString(this.getX()) +",py:2.2,pz:3.3,cardNumber:4,uID:"+this.authUID+"}"); // LEK todo: mudar para uma constante melhor
+        pd.setChat("empty");
+//        pd.setCmd("{cmd:TESTE,px:"+ Float.toString(this.getX()) +",py:2.2,pz:3.3,cardNumber:4,uID:"+this.authUID+"}");
+        class CmdObject {
+            Float px;
+            Float py;
+            String event;
+            String comando;
+            public CmdObject(Float px, Float py,String event){
+                this.px = px;
+                this.py = py;
+                this.event = event;
+                this.comando = "{cmd:"+event+",px:"+ px +",py:"+py+"}";
+            }
+
+        };
+//        Object newCmdObject = new CmdObject(this.getX(),this.getY(), "move");
+        pd.setCmd(new CmdObject(this.getX(),this.getY(),"Question").comando);
         pd.setAvatarType("A");
         return pd;
     }

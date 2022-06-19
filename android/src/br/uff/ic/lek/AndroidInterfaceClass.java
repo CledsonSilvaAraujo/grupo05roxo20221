@@ -14,6 +14,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.Calendar;
+import java.util.Dictionary;
+import java.util.Hashtable;
 
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -206,22 +208,6 @@ public class AndroidInterfaceClass extends Activity implements InterfaceAndroidF
             newAccount=false;
         }
 
-        /*
-        try {
-            // laurokozovits@gmail.com Exemplo123
-            //this.signIn("773394836@gmail.com", "773394836");
-            //this.signIn("3290544244@gmail.com", "3290544244");
-            // signIn faz efeito na próxima execução estou usando no emulador pixel4
-            // para remover é preciso desinstalar e desligar o telefone
-            this.signIn("laurokozovits@gmail.com", "Exemplo123");
-            playerNickName = "laurokozovits" ;//outra aposta para apelido do jogador
-
-        } catch (Exception e){
-            Log.d(TAG, "Exception signIn "+e.getMessage());
-        }
-        */
-
-
         // verificacao de e-mail
         //this.sendEmailVerification();
 
@@ -232,77 +218,8 @@ public class AndroidInterfaceClass extends Activity implements InterfaceAndroidF
 
         updateRealTimeDatabaseUserData(currentUser);
 
-        /*
-        Calendar cal = Calendar.getInstance();
-        Log.d(TAG,"Current time is :" + cal.getTime());
-        cal.setTimeInMillis(5000);
-        Log.d(TAG,"After setting Time: " + cal.getTime());
-        */
-
-        /*
-        if (waitingForTheFirstTime==false) {
-            waitingForTheFirstTime = true;
-            // pesquisa de valores
-            // ATENCAO
-            // se players...lastUpdateTime não existir não será ordenado, mas funciona
-            // se a child players nao existir, mas for criada posteriormente
-            // a tarefa de escutar (listener) vai funcionar normalmente
-            int ultimosUsuarios = 3;
-            DatabaseReference players = referencia.child("players");
-            // se você precisar de muitos campos de pesquisa, refaça a estrutura
-            // para criar um único campo composto da união de outros
-            // https://stackoverflow.com/questions/33336697/nosql-database-design-for-queries-with-multiple-restrictions-firebase
-            Query playerPesquisa = players.startAt("WAITING_-").endAt("WAITING_~").orderByChild("stateAndLastTime").limitToLast(ultimosUsuarios);
-            // see that: https://stackoverflow.com/questions/39076284/firebase-orderbykey-with-startat-and-endat-giving-wrong-results
-
-            // ORDEM CRESCENTE: o último a chegar é o mais recente
-            // Unfortunately firebase doesn't allow returning by descending order
-            //
-            // see SQL vs FIREBASE https://www.youtube.com/watch?v=sKFLI5FOOHs&list=PLl-K7zZEsYLlP-k-RKFa7RyNPa9_wCH2s&index=5
-            playerPesquisa.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    for (DataSnapshot zoneSnapshot : dataSnapshot.getChildren()) {
-
-                        Log.d(TAG, "listener dos " + ultimosUsuarios + " users ordem lastUpdateTime " + zoneSnapshot.child("cmd").getValue() + " " + zoneSnapshot.child("lastUpdateTime").getValue());
-                        // TODO chamar funcao de interface implementada por LIBGDX e setada aqui
-                        //if ()
-                        //AndroidInterfaceClass.gameLibGDX.exibeLa(msg);
-                        if (AndroidInterfaceClass.gameLibGDX != null) {
-                            String registrationTime = "" + zoneSnapshot.child("registrationTime").getValue();
-                            String authUID = "" + zoneSnapshot.child("authUID").getValue();
-                            String cmd = "" + zoneSnapshot.child("cmd").getValue();
-                            String lastUpdateTime = "" + zoneSnapshot.child("lastUpdateTime").getValue();
-
-                            // pegar a data do update para eliminar o processamento em dobro ou mensagens duplicadas
-                            //TODO:LEK
-                            // Qual e´o problema a ser resolvido
-                            // quando entra um novo usuario
-                            // aparece as mensagens de todos os players
-                            // multiplicados por 4
-                            // se ha´2 users x4 --> 8 mensagens ou 4 pares
-                            // se ha 3 users x4 --> 12 mensagens ou 4 trios
-                            // a ideia eh eliminar o processamento de mensagens iguais
-                            // a cada WAITING processar só as 10 mais
-                            // recentes
-                            AndroidInterfaceClass.gameLibGDX.enqueueMessage(InterfaceLibGDX.ALL_PLAYERS_DATA, registrationTime, authUID, cmd, lastUpdateTime);
-                        }
-                    }
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-                    Log.i(TAG, "playerPesquisa.addValueEventListener onCancelled", databaseError.toException());
-                }
-            });
-
-        }
-
-         */
     }
     public boolean waitingForTheFirstTime = false;
-
-
 
     @Override
     public void waitForMyMessages() {
@@ -330,35 +247,34 @@ public class AndroidInterfaceClass extends Activity implements InterfaceAndroidF
                     // TODO chamar funcao de interface implementada por LIBGDX e setada aqui
                     //if ()
                     //AndroidInterfaceClass.gameLibGDX.exibeLa(msg);
-                    if (AndroidInterfaceClass.gameLibGDX != null) {
-                        String registrationTime = "" + zoneSnapshot.child("registrationTime").getValue();
-                        String authUID = "" + zoneSnapshot.child("authUID").getValue();
-                        String cmd = "" + zoneSnapshot.child("cmd").getValue();
-                        String lastUpdateTime = "" + zoneSnapshot.child("lastUpdateTime").getValue();
+                    if (AndroidInterfaceClass.gameLibGDX == null) return;
 
-                        // pegar a data do update para eliminar o processamento em dobro ou mensagens duplicadas
-                        //TODO:LEK
-                        // Qual e´o problema a ser resolvido
-                        // quando entra um novo usuario
-                        // aparece as mensagens de todos os players
-                        // multiplicados por 4
-                        // se ha´2 users x4 --> 8 mensagens ou 4 pares
-                        // se ha 3 users x4 --> 12 mensagens ou 4 trios
-                        // a ideia eh eliminar o processamento de mensagens iguais
-                        // a cada WAITING processar só as 10 mais
-                        // recentes
-                        AndroidInterfaceClass.gameLibGDX.enqueueMessage(InterfaceLibGDX.MY_PLAYER_DATA, registrationTime, authUID, cmd, lastUpdateTime);
-                    }
+                    String registrationTime = "" + zoneSnapshot.child("registrationTime").getValue();
+                    String authUID = "" + zoneSnapshot.child("authUID").getValue();
+                    String cmd = "" + zoneSnapshot.child("cmd").getValue();
+                    String lastUpdateTime = "" + zoneSnapshot.child("lastUpdateTime").getValue();
+
+                    // pegar a data do update para eliminar o processamento em dobro ou mensagens duplicadas
+                    //TODO:LEK
+                    // Qual e´o problema a ser resolvido
+                    // quando entra um novo usuario
+                    // aparece as mensagens de todos os players
+                    // multiplicados por 4
+                    // se ha´2 users x4 --> 8 mensagens ou 4 pares
+                    // se ha 3 users x4 --> 12 mensagens ou 4 trios
+                    // a ideia eh eliminar o processamento de mensagens iguais
+                    // a cada WAITING processar só as 10 mais
+                    // recentes
+                    AndroidInterfaceClass.gameLibGDX.enqueueMessage(InterfaceLibGDX.MY_PLAYER_DATA, registrationTime, authUID, cmd, lastUpdateTime);
+
                 }
             }
-
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 Log.i(TAG, "playerPesquisa.addValueEventListener onCancelled", databaseError.toException());
             }
         });
     }
-
 
     @Override
     public void waitForPlayers(){
@@ -372,36 +288,38 @@ public class AndroidInterfaceClass extends Activity implements InterfaceAndroidF
 
         // ORDEM CRESCENTE: o último a chegar é o mais recente
         // Unfortunately firebase doesn't allow returning by descending order
-        //
         // see SQL vs FIREBASE https://www.youtube.com/watch?v=sKFLI5FOOHs&list=PLl-K7zZEsYLlP-k-RKFa7RyNPa9_wCH2s&index=5
         playerPesquisa.addValueEventListener(new ValueEventListener() {
+            Dictionary<String,String> getCmdDictionary(String cmd){
+                cmd = cmd.replaceAll("\\{","");
+                cmd = cmd.replaceAll("\\}","");
+                String[] params = cmd.split(",");
+                Dictionary<String,String> dictionaryParams = new Hashtable<String,String>();
+                for(String param : params){
+                    String[] data = param.split(":");
+                    String key = data[0];
+                    String value = data[1];
+                    dictionaryParams.put(key,value);
+                }
+                System.out.println("COMANDO: "+ cmd);
+                System.out.println("DICIONARIO: "+ dictionaryParams);
+                return  dictionaryParams;
+            }
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+
                 for (DataSnapshot zoneSnapshot : dataSnapshot.getChildren()) {
+                    Log.d(TAG, "On DataChange for child "+zoneSnapshot.child("authUID").getValue());
+                    if (AndroidInterfaceClass.gameLibGDX == null) return;
+                    String registrationTime = zoneSnapshot.child("registrationTime").getValue().toString();
+                    String authUID = zoneSnapshot.child("authUID").getValue().toString();
+                    String lastUpdateTime = zoneSnapshot.child("lastUpdateTime").getValue().toString();
 
-                    Log.d(TAG, "listener dos " + ultimosUsuarios + " users ordem lastUpdateTime " + zoneSnapshot.child("cmd").getValue() + " " + zoneSnapshot.child("lastUpdateTime").getValue());
-                    // TODO chamar funcao de interface implementada por LIBGDX e setada aqui
-                    //if ()
-                    //AndroidInterfaceClass.gameLibGDX.exibeLa(msg);
-                    if (AndroidInterfaceClass.gameLibGDX != null) {
-                        String registrationTime = "" + zoneSnapshot.child("registrationTime").getValue();
-                        String authUID = "" + zoneSnapshot.child("authUID").getValue();
-                        String cmd = "" + zoneSnapshot.child("cmd").getValue();
-                        String lastUpdateTime = "" + zoneSnapshot.child("lastUpdateTime").getValue();
+                    String cmd = zoneSnapshot.child("cmd").getValue().toString();
 
-                        // pegar a data do update para eliminar o processamento em dobro ou mensagens duplicadas
-                        //TODO:LEK
-                        // Qual e´o problema a ser resolvido
-                        // quando entra um novo usuario
-                        // aparece as mensagens de todos os players
-                        // multiplicados por 4
-                        // se ha´2 users x4 --> 8 mensagens ou 4 pares
-                        // se ha 3 users x4 --> 12 mensagens ou 4 trios
-                        // a ideia eh eliminar o processamento de mensagens iguais
-                        // a cada WAITING processar só as 10 mais
-                        // recentes
-                        AndroidInterfaceClass.gameLibGDX.enqueueMessage(InterfaceLibGDX.ALL_PLAYERS_DATA, registrationTime, authUID, cmd, lastUpdateTime);
-                    }
+                    System.out.println("Teste: " + getCmdDictionary(cmd).get("event"));
+
+                    AndroidInterfaceClass.gameLibGDX.enqueueMessage(InterfaceLibGDX.ALL_PLAYERS_DATA, registrationTime, authUID, cmd, lastUpdateTime);
                 }
             }
 
@@ -411,38 +329,8 @@ public class AndroidInterfaceClass extends Activity implements InterfaceAndroidF
             }
         });
 
-
     }
 
-
-//    @Override
-//    public void writePlayerData(){
-//        Log.d(TAG, "******** writePlayerData");
-//        // definir seu dados no Realtime Database com dados de usuario logado
-//        PlayerData pd = PlayerData.myPlayerData();// singleton
-//        pd.setAuthUID(uID);
-//        pd.setWriterUID(uID);
-//        pd.setGameState(PlayerData.States.READYTOPLAY);
-//        pd.setChat("empty"); // LEK todo: mudar para uma constante melhor
-//        pd.setCmd("{cmd:READYTOPLAY,px:1.1,py:2.2,pz:3.3,cardNumber:4,uID:"+uID+"}"); // LEK todo: mudar para uma constante melhor
-//        pd.setAvatarType("A");
-//        Log.d(TAG,"READYTOPLAY");
-//        pd.setPlayerNickName(playerNickName);
-//        pd.setEmail(email);
-//        Calendar calendar = Calendar.getInstance();
-//        java.util.Date now = calendar.getTime();
-//        java.sql.Timestamp currentTimestamp = new java.sql.Timestamp(now.getTime());
-//        pd.setTimestamp(currentTimestamp);
-//        pd.setLastUpdateTime("" + now.getTime());
-//        pd.setRegistrationTime("" + now.getTime());
-//        pd.setStateAndLastTime(pd.getGameState()+"_"+pd.getLastUpdateTime());
-//        pd.setRunningTimes(this.runningTimes);
-//        Log.d(TAG, "local timestamp:" + currentTimestamp.toString());
-//        Log.d(TAG, "System timestamp:" + System.currentTimeMillis());
-//
-//        myRef = database.getReference("players").child(uID);
-//        myRef.setValue(pd);
-//    }
     @Override
     public void writePlayerData(Avatar player){
         myRef = database.getReference("players").child(player.getAuthUID());
@@ -461,7 +349,7 @@ public class AndroidInterfaceClass extends Activity implements InterfaceAndroidF
             pd.setGameState(PlayerData.States.WAITING);
             pd.setChat("empty"); // LEK todo: mudar para uma constante melhor
             pd.setAvatarType("A");
-            pd.setCmd("{cmd:WAITING,px:1.1,py:2.2,pz:3.3,cardNumber:4,uID:"+uID+"}"); // LEK todo: mudar para uma constante melhor
+            pd.setCmd("{cmd:BErinjela,px:1.1,py:2.2,pz:3.3,cardNumber:4,uID:"+uID+"}"); // LEK todo: mudar para uma constante melhor
             Log.d(TAG,"WAITING");
             pd.setPlayerNickName(playerNickName);
             pd.setEmail(email);
@@ -518,22 +406,7 @@ public class AndroidInterfaceClass extends Activity implements InterfaceAndroidF
                 // TODO botão de saída do PM não esta fechando direito o app
                 Log.d(TAG, "CONTA EXISTENTE:" + pd.getRegistrationTime());
                 myRef.setValue(pd);
-                /*
-                //myRef.child("authUID").setValue(pd.getAuthUID());//nao muda
-                myRef.child("chat").setValue(pd.getChat());
-                myRef.child("cmd").setValue(pd.getCmd());
-                myRef.child("email").setValue(pd.getEmail());// pode alterar eventualmente
-                myRef.child("gameState").setValue(pd.getGameState());
-                myRef.child("lastUpdateTime").setValue(pd.getLastUpdateTime());
-                myRef.child("stateAndLastTime").setValue(pd.getGameState()+"_"+pd.getLastUpdateTime());
-                myRef.child("playerNickName").setValue(pd.getPlayerNickName());// pode alterar eventualmente
-                // não muda o tempo de registro inicial do jogador
-                //myRef.child("registrationTime").setValue(pd.getRegistrationTime());
-                myRef.child("timestamp").setValue(pd.getTimestamp());
-                myRef.child("writerUID").setValue(pd.getWriterUID());
-                myRef.child("runningTimes").setValue(pd.getRunningTimes());
 
-                */
             }
             if (fazSoUmaVez == 0){
                 fazSoUmaVez++;
@@ -544,8 +417,6 @@ public class AndroidInterfaceClass extends Activity implements InterfaceAndroidF
         }
     }
     private int fazSoUmaVez=0;
-
-
     public static InterfaceLibGDX gameLibGDX = null;
 
     @Override
@@ -555,15 +426,10 @@ public class AndroidInterfaceClass extends Activity implements InterfaceAndroidF
         AndroidInterfaceClass.gameLibGDX = iLibGDX;
     }
 
-
-
-
-
     @Override
     public void finishAndRemoveTask(){
         this.finishAndRemoveTask();
     }
-
 }
 
 

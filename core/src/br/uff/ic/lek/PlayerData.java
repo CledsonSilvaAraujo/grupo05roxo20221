@@ -60,6 +60,7 @@ public class PlayerData {
     String stateAndLastTime;
     int runningTimes;
     String avatarType;
+    Object cmdObj;
 
     public String getAvatarType() {
         return avatarType;
@@ -185,6 +186,9 @@ public class PlayerData {
 
     public void setCmd(String cmd) {
         this.cmd = cmd;
+    }
+    public void setCmdObj(Object cmd) {
+        this.cmdObj  = cmd;
     }
 
     public void setPlayerNickName(String playerNickName) {
