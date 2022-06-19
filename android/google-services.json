@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "428630660051",
+    "firebase_url": "https://alquimia-g5r-default-rtdb.firebaseio.com",
+    "project_id": "alquimia-g5r",
+    "storage_bucket": "alquimia-g5r.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:428630660051:android:1f4ca4b605ccc001dc5526",
+        "android_client_info": {
+          "package_name": "br.uff.ic.lek"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "428630660051-taggpd9hnp2qmgi651k4uv4p67g1q0ro.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB38bPmD10Ea7gwpSSUE_RZUAGqArXc5KA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "428630660051-taggpd9hnp2qmgi651k4uv4p67g1q0ro.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
