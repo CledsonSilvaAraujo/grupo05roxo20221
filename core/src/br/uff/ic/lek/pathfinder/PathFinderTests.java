@@ -16,37 +16,95 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.StringBuilder;
 
-/** Test class for pathfinding algorithms.
- * 
- * @author davebaol */
+
 public class PathFinderTests extends GdxAiTest {
-
-	public static void main (String[] argv) {
-		launch(new PathFinderTests());
-	}
-
 	private static final boolean DEBUG_STAGE = false;
 
 	public CollapsableWindow algorithmSelectionWindow;
+
+	public Skin skin;
+	public float stageWidth;
+	public float stageHeight;
+	public Stage stage;
+
 	Label fpsLabel;
 	StringBuilder fpsStringBuilder;
+	
+	Table testsTable;
+	PathFinderTestBase currentTest;
 
-	// @off - disable libgdx formatter
 	PathFinderTestBase [] tests = {
 		new FlatTiledAStarTest(this),
 		new HierarchicalTiledAStarTest(this),
 		new InterruptibleFlatTiledAStarTest(this),
 		new InterruptibleHierarchicalTiledAStarTest(this)
 	};
-	// @on - enable libgdx formatter
 
-	Table testsTable;
-	PathFinderTestBase currentTest;
+	private List<String> createTestList () {
+		// Create behavior names
+		int numBehaviors = tests.length;
+		String[] algorithmNames = new String[numBehaviors];
+		for (int i = 0; i < numBehaviors; i++) {
+			algorithmNames[i] = tests[i].testName;
+		}
 
-	public Skin skin;
-	public float stageWidth;
-	public float stageHeight;
-	public Stage stage;
+		final List<String> algorithmList = new List<String>(skin);
+		algorithmList.setItems(algorithmNames);
+		algorithmList.addListener(new ClickListener() {
+			@Override
+			public void clicked (InputEvent event, float x, float y) {
+				if (!algorithmSelectionWindow.isCollapsed() && getTapCount() == 2) {
+					changeTest(algorithmList.getSelectedIndex());
+					algorithmSelectionWindow.collapse();
+				}
+			}
+		});
+		return algorithmList;
+	}
+
+	private void changeTest (int index) {
+		testsTable.clear();
+		if (currentTest != null) {
+			if (currentTest.getDetailWindow() != null) currentTest.getDetailWindow().remove();
+			currentTest.dispose();
+		}
+
+		currentTest = tests[index];
+		currentTest.create(testsTable);
+		InputMultiplexer im = (InputMultiplexer)Gdx.input.getInputProcessor();
+		if (im.size() > 1) im.removeProcessor(1);
+		if (currentTest.getInputProcessor() != null) im.addProcessor(currentTest.getInputProcessor());
+		if (currentTest.getDetailWindow() != null) stage.addActor(currentTest.getDetailWindow());
+	}
+
+	protected void updateStatusBarText (final StringBuilder stringBuilder) {
+		stringBuilder.append("FPS: ").append(Gdx.graphics.getFramesPerSecond());
+	}
+
+	protected CollapsableWindow addBehaviorSelectionWindow (String title, List<String> testList, float x, float y) {
+
+		CollapsableWindow window = new CollapsableWindow(title, skin);
+		window.row();
+
+		ScrollPane pane = new ScrollPane(testList, skin);
+		pane.setFadeScrollBars(false);
+		pane.setScrollX(0);
+		pane.setScrollY(0);
+
+		window.add(pane);
+		window.pack();
+		window.pack();
+		if (window.getHeight() > stage.getHeight()) {
+			window.setHeight(stage.getHeight());
+		}
+		window.setX(x < 0 ? stage.getWidth() - (window.getWidth() - (x + 1)) : x);
+		window.setY(y < 0 ? stage.getHeight() - (window.getHeight() - (y + 1)) : y);
+		window.layout();
+		window.collapse();
+		stage.addActor(window);
+
+		return window;
+	}
 
 	@Override
 	public void create () {
@@ -82,7 +140,6 @@ public class PathFinderTests extends GdxAiTest {
 		changeTest(0);
 
 		fpsLabel = new Label("FPS: 999", skin);
-// updateLabel();
 		stage.addActor(fpsLabel);
 	}
 
@@ -108,72 +165,7 @@ public class PathFinderTests extends GdxAiTest {
 		stageHeight = height;
 	}
 
-	protected void updateStatusBarText (final StringBuilder stringBuilder) {
-		stringBuilder.append("FPS: ").append(Gdx.graphics.getFramesPerSecond());
+	public static void main (String[] argv) {
+		launch(new PathFinderTests());
 	}
-
-	private List<String> createTestList () {
-		// Create behavior names
-		int numBehaviors = tests.length;
-		String[] algorithmNames = new String[numBehaviors];
-		for (int i = 0; i < numBehaviors; i++) {
-			algorithmNames[i] = tests[i].testName;
-		}
-
-		final List<String> algorithmList = new List<String>(skin);
-		algorithmList.setItems(algorithmNames);
-		algorithmList.addListener(new ClickListener() {
-			@Override
-			public void clicked (InputEvent event, float x, float y) {
-				if (!algorithmSelectionWindow.isCollapsed() && getTapCount() == 2) {
-					changeTest(algorithmList.getSelectedIndex());
-					algorithmSelectionWindow.collapse();
-				}
-			}
-		});
-		return algorithmList;
-	}
-
-	protected CollapsableWindow addBehaviorSelectionWindow (String title, List<String> testList, float x, float y) {
-
-		CollapsableWindow window = new CollapsableWindow(title, skin);
-		window.row();
-
-		ScrollPane pane = new ScrollPane(testList, skin);
-		pane.setFadeScrollBars(false);
-		pane.setScrollX(0);
-		pane.setScrollY(0);
-
-		window.add(pane);
-		window.pack();
-		window.pack();
-		if (window.getHeight() > stage.getHeight()) {
-			window.setHeight(stage.getHeight());
-		}
-		window.setX(x < 0 ? stage.getWidth() - (window.getWidth() - (x + 1)) : x);
-		window.setY(y < 0 ? stage.getHeight() - (window.getHeight() - (y + 1)) : y);
-		window.layout();
-		window.collapse();
-		stage.addActor(window);
-
-		return window;
-	}
-
-	void changeTest (int index) {
-		// Remove the old behavior and its window
-		testsTable.clear();
-		if (currentTest != null) {
-			if (currentTest.getDetailWindow() != null) currentTest.getDetailWindow().remove();
-			currentTest.dispose();
-		}
-
-		// Add the new behavior and its window
-		currentTest = tests[index];
-		currentTest.create(testsTable);
-		InputMultiplexer im = (InputMultiplexer)Gdx.input.getInputProcessor();
-		if (im.size() > 1) im.removeProcessor(1);
-		if (currentTest.getInputProcessor() != null) im.addProcessor(currentTest.getInputProcessor());
-		if (currentTest.getDetailWindow() != null) stage.addActor(currentTest.getDetailWindow());
-	}
-
 }
