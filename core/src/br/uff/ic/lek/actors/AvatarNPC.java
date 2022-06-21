@@ -21,9 +21,15 @@ Ainda não planejado. É preciso estudar os steering behaviors da LibGDX
  */
 
 package br.uff.ic.lek.actors;
-
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import br.uff.ic.lek.actors.Avatar;
 
-public class NPCs extends Sprite {
+public class AvatarNPC extends Avatar {
 
+    public AvatarNPC(Sprite sprite, float x, float y, String authUID) {
+        super(sprite, x, y, authUID);
+    }
+    protected void move(float delta){
+
+    }
 }

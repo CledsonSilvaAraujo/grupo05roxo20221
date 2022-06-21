@@ -68,7 +68,11 @@ public class ClassThreadComandos extends Thread implements InterfaceLibGDX {
 	@Override
 	public void run() {
 		while (true) {
-			Thread.sleep(100);
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 			
 			if (!filaComandos.isEmpty()) {
 				ClassComandos elementoFilaComandos = filaComandos.poll();

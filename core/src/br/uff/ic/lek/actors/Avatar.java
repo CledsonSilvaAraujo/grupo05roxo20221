@@ -1,25 +1,3 @@
-/*
-    Fábrica de Software para Educação
-    Professor Lauro Kozovits, D.Sc.
-    ProfessorKozovits@gmail.com
-    Universidade Federal Fluminense, UFF
-    Rio de Janeiro, Brasil
-    Subprojeto: Alchemie Zwei
-
-    Partes do software registradas no INPI como integrantes de alguns apps para smartphones
-    Copyright @ 2016..2022
-
-    Se você deseja usar partes do presente software em seu projeto, por favor mantenha esse cabeçalho e peça autorização de uso.
-    If you wish to use parts of this software in your project, please keep this header and ask for authorization to use.
-
- */
-
-/*
-Avatar.java
-Nesse módulo há a representaçao gráfica do jogador como um Sprite
-a lógica de animação de sprites, bem como seu deslocamento são realizadas aqui
-O módulo deve ser melhorado para representar os demais jogadores da versão multiplayer
- */
 package br.uff.ic.lek.actors;
 
 import br.uff.ic.lek.PlayerData;
@@ -41,72 +19,19 @@ import java.util.Locale;
 
 public class Avatar extends Sprite {
 
-    // authUID para fazer o casamento do avatar gráfico(Sprite) com o jogador armazenado no Firebase
     String authUID;
-
-    public String getAuthUID() {
-        return authUID;
+    private AvatarPower avatarPower;
+    private Compass orientation;
+    public enum Compass {
+        SOUTH, NORTH, WEST, EAST, SOUTH_WEST, NORTH_WEST, SOUTH_EAST, NORTH_EAST
     }
-
-    public void setAuthUID(String authUID) {
-        this.authUID = authUID;
-    }
-
     public enum State {
         IDLE, WALKING, DYING
     }
     private State state = State.IDLE;
-
-    public State getState() {
-        return state;
-    }
-    public void setState(State state) {
-        this.state = state;
-    }
-
-    private AvatarPower avatarPower;
-
-
-    public enum Compass {
-        SOUTH, NORTH, WEST, EAST, SOUTH_WEST, NORTH_WEST, SOUTH_EAST, NORTH_EAST
-    }
-
-    private Compass orientation;
-
-    public Compass getOrientation(){
-        return orientation;
-    }
-    public void setOrientation(Compass orientation){
-        this.orientation = orientation;
-    }
-    public void defineOrientation(double anguloGraus){
-        if (anguloGraus > 22.5 &&  anguloGraus <= 67.5)
-            this.orientation = Compass.NORTH_EAST;
-        else if (anguloGraus > 67.5 &&  anguloGraus <= 112.5)
-            this.orientation = Compass.NORTH;
-        else if (anguloGraus > 112.5 &&  anguloGraus <= 157.5)
-            this.orientation = Compass.NORTH_WEST;
-        else if (anguloGraus > 157.5 &&  anguloGraus <= 202.5)
-            this.orientation = Compass.WEST;
-        else if (anguloGraus > 202.5 &&  anguloGraus <= 247.5)
-            this.orientation = Compass.SOUTH_WEST;
-        else if (anguloGraus > 247.5 &&  anguloGraus <= 292.5)
-            this.orientation = Compass.SOUTH;
-        else if (anguloGraus > 292.5 &&  anguloGraus <= 337.5)
-            this.orientation = Compass.SOUTH_EAST;
-        else  //		if (anguloGraus > 337.5 &&  anguloGraus <= 22.5)
-            this.orientation = Compass.EAST;
-    }
-
     private Vector3 vetorUnitarioMovimento;
     private double playerMovementAngle;
-
-    public static float SPEED = 128f;	// unit per second (two tiles per second)
-    // Atenção: se você considerar que um tile tem largura compatível com um metro
-    // então a velocidade do jogador seria 4m/segundo ou 14,4km/h
-    // Entretanto, o jogador percorre um terreno de 6400 pixels ("200m") em 25s aprox. ou 256 pixels/segundo
-    //  Qual é o bug?
-
+    public static float SPEED = 128f;
     private Vector3 velocity = new Vector3();
     private Vector3 temp = new Vector3(0,0,0);
     private Vector3 current = new Vector3(0,0,0);
@@ -130,8 +55,7 @@ public class Avatar extends Sprite {
     private float elapsedTime;
     private TextureRegion currentFrame;
     private float tempoAcumulado;
-
-
+    public boolean houveColisao;
 
     public Avatar(Sprite sprite, float x, float y, String authUID) {
         super(sprite);
@@ -190,11 +114,82 @@ public class Avatar extends Sprite {
 
     }
 
-    public boolean houveColisao;
-    public void update(float delta) {
+    public void setState(State state) {
+        this.state = state;
+    }
 
+    public String getAuthUID() {
+        return authUID;
+    }
 
-        avatarPower.setPower(avatarPower.getPower() - 0.01f);// decrescimo arbitrário só para ver funcionando
+    public void setAuthUID(String authUID) {
+        this.authUID = authUID;
+    }
+
+    public State getState() {
+        return state;
+    }
+
+    public Compass getOrientation(){
+        return orientation;
+    }
+
+    public void setOrientation(Compass orientation){
+        this.orientation = orientation;
+    }
+
+    public void defineOrientation(double anguloGraus){
+        if (anguloGraus > 22.5 &&  anguloGraus <= 67.5)
+            this.orientation = Compass.NORTH_EAST;
+        else if (anguloGraus > 67.5 &&  anguloGraus <= 112.5)
+            this.orientation = Compass.NORTH;
+        else if (anguloGraus > 112.5 &&  anguloGraus <= 157.5)
+            this.orientation = Compass.NORTH_WEST;
+        else if (anguloGraus > 157.5 &&  anguloGraus <= 202.5)
+            this.orientation = Compass.WEST;
+        else if (anguloGraus > 202.5 &&  anguloGraus <= 247.5)
+            this.orientation = Compass.SOUTH_WEST;
+        else if (anguloGraus > 247.5 &&  anguloGraus <= 292.5)
+            this.orientation = Compass.SOUTH;
+        else if (anguloGraus > 292.5 &&  anguloGraus <= 337.5)
+            this.orientation = Compass.SOUTH_EAST;
+        else  //		if (anguloGraus > 337.5 &&  anguloGraus <= 22.5)
+            this.orientation = Compass.EAST;
+    }
+
+    protected void move(float delta){
+
+        if(!WorldController.clicado) return;
+
+        double distancia = Math.sqrt((current.x - WorldController.target.x)*(current.x - WorldController.target.x) + (current.y - WorldController.target.y)*(current.y - WorldController.target.y));
+        vetorUnitarioMovimento.x = (float) ((WorldController.target.x -current.x)/distancia);
+        vetorUnitarioMovimento.y = (float) ((WorldController.target.y -current.y)/distancia);
+        double angulo1 = Math.acos((double) vetorUnitarioMovimento.x )*180.0/Math.PI;
+        double angulo2 = Math.asin((double) vetorUnitarioMovimento.y )*180.0/Math.PI;
+
+        if(angulo2 >= 0.0){
+            playerMovementAngle = angulo1;
+        }
+        else{
+            playerMovementAngle = 360.0 - angulo1;
+        }
+
+        defineOrientation(playerMovementAngle);
+        double posx = (WorldController.target.x -current.x)/distancia * Avatar.SPEED*delta  + current.x;
+        double posy = (WorldController.target.y -current.y)/distancia * Avatar.SPEED*delta  + current.y;
+        current.x = (float) posx;
+        current.y = (float) posy;
+        this.setPosition(current.x, current.y);
+        this.setState(State.WALKING);
+        if(this.current.dst(WorldController.target.x, WorldController.target.y, 0) < 32/2) {
+            WorldController.clicado = false;
+            this.setState(State.IDLE);
+        }
+    }
+
+    protected void collide(float delta){
+
+        avatarPower.setPower(avatarPower.getPower() - 0.01f);
 
         if(this.velocity.x > Avatar.SPEED) {
             this.velocity.x = Avatar.SPEED;
@@ -213,134 +208,54 @@ public class Avatar extends Sprite {
         temp.y = this.getY();
         current = temp;
 
-
-        //Accelerometer movement
-        //*
         if(Gdx.input.isPeripheralAvailable(Peripheral.Accelerometer)) {
-            //float accelSouth = Gdx.input.getAccelerometerX();
-            //float accelEast = Gdx.input.getAccelerometerY();
-
-            //TODO colocar movimentos laterais LEK e diminuir a sensibilidade do acelerometro para permitir combates com dragtouch nos 4 sentidos
-            // somente quando muito inclinado > 20 graus eh que comeca andar e a 90 graus vai super rapido
-
-
-            // suponha uma bussola orientando os vetores de movimento.
-            // somente com módulo >= 2.0f havera movimento
-            // Por exemplo uma inclinação somente para o NORTH irá resultar em movimento para o norte (para cima) somente quando accelX < -2 (modulo 2)
-            // Entretanto, é possível haver movimento com módulo de accelX menor que 2 desde que a composição do movimento com accelY resulte em módulo 2
-            // Esse seria o caso de (accelY*accelY+accelX*accelX)>=4.0
-
-            // ver o grau de inclinação
-            // se modulo maior que 2 vai andar
-            // verificar o angulo é dar a orientacao correspondente
-
-
-            //double angle = Math.atan((double) accelSouth/(double) accelEast)/(Math.PI/180.0);
             tempoAcumulado += delta;
             if (tempoAcumulado > 1.0){
-                //float angle = Gdx.input.getAzimuth();
                 tempoAcumulado = 0.0f;
-                //Gdx.app.log("Player ", " accelSouth="+accelSouth + " accelEast="+accelEast);
-                //WorldRenderer.mensagem = " South="+accelSouth+ " East="+accelEast;
-            }
-
-
-        }
-        //*/
-
-        //Touch movement
-        if(WorldController.clicado) {
-            //Gdx.app.log("Player ", " clicado x="+this.getX() + " y="+this.getY());
-            if(houveColisao == false){
-                //current.lerp(new Vector3(WorldController.target.x, WorldController.target.y, 0), 0.005f/world.getCamera().zoom);
-                double distancia = Math.sqrt((current.x - WorldController.target.x)*(current.x - WorldController.target.x) + (current.y - WorldController.target.y)*(current.y - WorldController.target.y));
-                vetorUnitarioMovimento.x = (float) ((WorldController.target.x -current.x)/distancia);
-                vetorUnitarioMovimento.y = (float) ((WorldController.target.y -current.y)/distancia);
-                double angulo1 = Math.acos((double) vetorUnitarioMovimento.x )*180.0/Math.PI; // [-90.0 .. 90.0]
-                double angulo2 = Math.asin((double) vetorUnitarioMovimento.y )*180.0/Math.PI; // [0.0 .. 180.0]
-                if(angulo2 >= 0.0)
-                    playerMovementAngle = angulo1;
-                else
-                    playerMovementAngle = 360.0 - angulo1;
-                defineOrientation(playerMovementAngle);
-                //System.out.println("angulo1="+angulo1+" angulo2="+angulo2+" Valendo="+playerMovementAngle);
-
-
-                // TODO: descubra o erro: a velocidade está o dobro da prevista
-                double posx = (WorldController.target.x -current.x)/distancia * Avatar.SPEED*delta  + current.x;
-                double posy = (WorldController.target.y -current.y)/distancia * Avatar.SPEED*delta  + current.y;
-                current.x = (float) posx;
-                current.y = (float) posy;
-                this.setPosition(current.x, current.y);
-                this.setState(State.WALKING);
-            }
-            if(this.current.dst(WorldController.target.x, WorldController.target.y, 0) < 32/2) {
-                WorldController.clicado = false;
-                this.setState(State.IDLE);
             }
         }
-
-
-        //Gdx.app.log("Player", "check indo para tx="+WorldController.target.x+" ty="+WorldController.target.y);
-        //Gdx.app.log("Player", "goodPos x="+goodPos.x+" y="+goodPos.y);
-        houveColisao = false;
-
 
         if(houveColisao == false){
             goodPos.x = (int) current.x;
             goodPos.y = (int) current.y;
         }
-
-        //Check world boundaries
         if(this.getX() < 0) {
-            Gdx.input.vibrate(50);// precisa setar a permissão em AndroidManifest
-            //this.setX(temp.x + 1);
+            Gdx.input.vibrate(50);
             this.setX(1);
             temp.x = this.getX();
             this.getVelocity().x = 0;
             this.setState(State.IDLE);
         } else if(this.getX() > (World.getMapWidthPixel() - this.getWidth())) {
-            Gdx.input.vibrate(50);// precisa setar a permissão em AndroidManifest
-            //this.setX(temp.x - 1);
+            Gdx.input.vibrate(50);
             this.setX(World.getMapWidthPixel() - this.getWidth() - 1);
             temp.x = this.getX();
             this.getVelocity().x = 0;
             this.setState(State.IDLE);
-        } else {
-            //this.setX(this.getX() + this.velocity.x * delta);
-            //this.setState(State.WALKING);
-            //Gdx.app.log("Player ", "Player position updated!");
         }
         if(this.getY() < 0) {
-            Gdx.input.vibrate(50);// precisa setar a permissão em AndroidManifest
-            //this.setY(temp.y + 1);
+            Gdx.input.vibrate(50);
             this.setY(1);
             temp.y = this.getY();
             this.getVelocity().y = 0;
             this.setState(State.IDLE);
         } else if(this.getY() > (World.getMapHeightPixel() - this.getHeight())) {
-            Gdx.input.vibrate(50);// precisa setar a permissão em AndroidManifest
-            //this.setY(temp.y - 1);
+            Gdx.input.vibrate(50);
             this.setY(World.getMapHeightPixel() - this.getHeight() -1);
             temp.y = this.getY();
             this.getVelocity().y = 0;
             this.setState(State.IDLE);
-        } else {
-            //this.setY(this.getY() + this.velocity.y * delta);
-            //this.setState(State.WALKING);
-            //Gdx.app.log("Player ", "Player position updated!");
         }
+    }
+
+    public void update(float delta) {
+        move(delta);
+        collide(delta);
     }
 
     public void draw(OrthographicCamera camera, BitmapFont font, String mensagem, Batch batch) {
         this.update(Gdx.graphics.getDeltaTime());
-        //Gdx.app.log("Player ", "Player updated!");
         elapsedTime += Gdx.graphics.getDeltaTime();
-
-
         if(this.getState() == State.IDLE) {
-
-            // LEK TODO trocar um único sprite por uma animação do personagem parado balançando de um lado para o outro. Esta é uma técnica de animação usada profissionalmente
 
             if(this.orientation == Compass.SOUTH) {
                 this.currentFrame = World.atlasPlayerS_W_E_N.findRegion("South02");
@@ -353,8 +268,6 @@ public class Avatar extends Sprite {
             }
         }
         if(this.getState() == State.WALKING) {
-            //Gdx.app.log("Player ", "elapsedTime= "+elapsedTime);
-            //System.out.println(this.orientation);
             if(this.orientation == Compass.WEST) {
                 this.currentFrame = (TextureRegion) walkingWest.getKeyFrame(this.elapsedTime, true);
             } else 	if(this.orientation == Compass.EAST) {
@@ -388,31 +301,25 @@ public class Avatar extends Sprite {
         batch.end();
         batch.begin();
         avatarPower.draw(camera, this.getX(), this.getY());
-        //
-        //Gdx.app.log("Player ", "Player drew!");
     }
 
     @Override
     public float getX() {
-        // TODO Auto-generated method stub
         return super.getX();
     }
 
     @Override
     public float getY() {
-        // TODO Auto-generated method stub
         return super.getY();
     }
 
     @Override
     public float getWidth() {
-        // TODO Auto-generated method stub
         return super.getWidth();
     }
 
     @Override
     public float getHeight() {
-        // TODO Auto-generated method stub
         return super.getHeight();
     }
 
@@ -426,7 +333,6 @@ public class Avatar extends Sprite {
         pd.setWriterUID(this.authUID);
         pd.setGameState(PlayerData.States.READYTOPLAY);
         pd.setChat("empty");
-//        pd.setCmd("{cmd:TESTE,px:"+ Float.toString(this.getX()) +",py:2.2,pz:3.3,cardNumber:4,uID:"+this.authUID+"}");
         class CmdObject {
             Float px;
             Float py;
@@ -440,12 +346,8 @@ public class Avatar extends Sprite {
             }
 
         };
-//        Object newCmdObject = new CmdObject(this.getX(),this.getY(), "move");
         pd.setCmd(new CmdObject(this.getX(),this.getY(),"Question").comando);
         pd.setAvatarType("A");
         return pd;
     }
-
-
-
 }

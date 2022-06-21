@@ -221,7 +221,7 @@ public class AndroidInterfaceClass extends Activity implements InterfaceAndroidF
 	public void onStart() {
 		super.onStart();
 		FirebaseUser currentUser = mAuth.getCurrentUser();
-		if (currentUser != null) reload();
+//		if (currentUser != null) reload();
 	}
 
 	@Override

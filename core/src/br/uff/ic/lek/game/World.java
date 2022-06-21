@@ -2,6 +2,7 @@ package br.uff.ic.lek.game;
 
 import br.uff.ic.lek.PlayerData;
 import br.uff.ic.lek.actors.Avatar;
+import br.uff.ic.lek.actors.AvatarNPC;
 import br.uff.ic.lek.utils.CameraZoomAdjust;
 import br.uff.ic.lek.utils.ClassToast;
 import br.uff.ic.lek.utils.PathPlanning;
@@ -27,19 +28,18 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.sun.tools.javac.util.ArrayUtils;
 
 import aurelienribon.tweenengine.BaseTween;
 import aurelienribon.tweenengine.Timeline;
 import aurelienribon.tweenengine.Tween;
 import aurelienribon.tweenengine.TweenCallback;
 import aurelienribon.tweenengine.TweenManager;
-import aurelienribon.tweenengine.equations.Bounce;
-import aurelienribon.tweenengine.equations.Elastic;
 import aurelienribon.tweenengine.equations.Expo;
-import aurelienribon.tweenengine.equations.Linear;
 
+import java.sql.Array;
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class World {
@@ -49,7 +49,6 @@ public class World {
 
 	public static World world=null;
 	public static OrthographicCamera camera;
-	public static Stage stageCG;
 	public static TweenManager tweenManager;
 	public static TextureAtlas atlasPlayerS_W_E_N;
 	public static TextureAtlas atlasPlayerSW_NW_SE_NE;
@@ -60,15 +59,16 @@ public class World {
 	public static int avatarStartTileX;
 	public static int avatarStartTileY;
 	public static String mensagem;
+	public static int maxNumberOfAvatars = 4;
 
 	private CameraController controller;
 	private GestureDetector gestureDetector;
 	private CameraZoomAdjust cameraZoomAdjust;
 	private OrthogonalTiledMapRenderer tiledMapRender;
 	private AssetManager assets;
-	private Avatar avatar;
 	private float count=100.0f;
 	private BitmapFont font;
+	private List<Avatar> avatars = new ArrayList<Avatar>();
 
 	public WorldController worldController;
 	public InputMultiplexer inputMultiplexer;
@@ -112,16 +112,17 @@ public class World {
 		World.atlasPlayerS_W_E_N = this.assets.get("img/guerreiraS_W_E_N_210x280.pack");
 		World.atlasPlayerSW_NW_SE_NE = this.assets.get("img/guerreiraSW_NW_SE_NE_210x280.pack");
 
-		this.avatar = new Avatar(new Sprite(World.atlasPlayerS_W_E_N.findRegion("South02")), (avatarStartTileX)*World.tileWidth, avatarStartTileY*World.tileHeight, PlayerData.myPlayerData().getAuthUID());
-		System.out.println("BANANA"+this.avatar.getAuthUID());
-		World.camera = new OrthographicCamera(this.avatar.getX(), this.avatar.getY());
+		Avatar avatar = new Avatar(new Sprite(World.atlasPlayerS_W_E_N.findRegion("South02")), (avatarStartTileX)*World.tileWidth, avatarStartTileY*World.tileHeight, PlayerData.myPlayerData().getAuthUID());
+		this.createNPC();
+		World.camera = new OrthographicCamera(avatar.getX(), avatar.getY());
 		World.camera.zoom = 0.5f;
 
 		pathPlan = new PathPlanning(this);
 		pathPlan.create();
 
-		this.avatar.setX(avatarStartTileX*World.tileWidth);
-		this.avatar.setY(avatarStartTileY*World.tileHeight);
+		avatar.setX(avatarStartTileX*World.tileWidth);
+		avatar.setY(avatarStartTileY*World.tileHeight);
+		this.addAvatar(avatar);
 	}
 
 	public static void load() {
@@ -130,7 +131,6 @@ public class World {
 
 		World.tweenManager = new TweenManager();
 		world.worldController = new WorldController(World.world);
-
 
 		world.batch = new SpriteBatch();
 		World.hud = new ClassHud(world.batch);
@@ -245,7 +245,7 @@ public class World {
 	}
 
 	public Avatar getAvatar() {
-			return this.avatar;
+			return this.avatars.get(0);
 	}
 
 	public OrthographicCamera getCamera() {
@@ -255,6 +255,28 @@ public class World {
 	public void setBounds(ArrayList<Rectangle> bounds) {
 			World.bounds = bounds;
 	}
+
+	private int getAvatarsTotal(){
+		return this.avatars.size();
+	}
+
+	private void addAvatar(Avatar avatar){
+		if (this.getAvatarsTotal() == World.maxNumberOfAvatars) {
+			System.out.println("Limit of Avatars reached");
+			return;
+		}
+		this.avatars.add(avatar);
+	}
+
+	private void createNPC(){
+		AvatarNPC npc = new AvatarNPC(new Sprite(World.atlasPlayerS_W_E_N.findRegion("South02")), (avatarStartTileX)*World.tileWidth, avatarStartTileY*World.tileHeight, "A");
+		this.addAvatar(npc);
+	}
+
+	public List<Avatar> getAvatars(){
+		return this.avatars;
+	}
+
 }
 
 class CameraController implements GestureDetector.GestureListener {
