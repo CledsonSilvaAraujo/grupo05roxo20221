@@ -36,6 +36,7 @@ public class Avatar extends Sprite {
     private Vector3 temp = new Vector3(0,0,0);
     private Vector3 current = new Vector3(0,0,0);
     private Vector3 goodPos = new Vector3(0,0,0);
+    private Vector3 target = new Vector3(0,0,0);
     private Animation walkingWest;
     private Animation walkingEast;
     private Animation walkingNorth;
@@ -128,6 +129,11 @@ public class Avatar extends Sprite {
 
     public State getState() {
         return state;
+    }
+
+    public void setTarget(float x,float y){
+        this.target.x=x;
+        this.target.y=y;
     }
 
     public Compass getOrientation(){

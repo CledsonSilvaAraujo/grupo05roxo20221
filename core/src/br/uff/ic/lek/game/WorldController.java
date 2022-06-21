@@ -23,9 +23,18 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector3;
 import java.util.ArrayList;
+import java.util.Dictionary;
 import java.util.List;
 
 public class WorldController implements InputProcessor {
+    public static Vector3 vec;
+    public static Vector3 target;
+    public static boolean clicado;
+
+    public float minCameraX;
+    public float maxCameraX;
+    public float minCameraY;
+    public float maxCameraY;
 
     private World world;
     private List<Avatar> avatars = new ArrayList<Avatar>();
@@ -34,13 +43,7 @@ public class WorldController implements InputProcessor {
     private boolean requestMove;
     private boolean fezTouchDown;
     private int firstX, firstY;
-    public float minCameraX;
-    public float maxCameraX;
-    public float minCameraY;
-    public float maxCameraY;
-    public static Vector3 vec;
-    public static Vector3 target;
-    public static boolean clicado;
+
 
 
     public WorldController(World world) {
@@ -48,6 +51,17 @@ public class WorldController implements InputProcessor {
         this.camera = this.world.getCamera();
         this.avatars = this.world.getAvatars();
         this.player = this.avatars.get(0);
+    }
+
+    public void onNotification(Dictionary<String,String> cmdData){
+        for(Avatar avatar:this.avatars){
+            if(avatar.getAuthUID()==cmdData.get("uID")){
+                if(cmdData.get("cmd")=="MOVE")
+                    avatar.setState(State.WALKING);
+                WorldController.target.x= Float.parseFloat(cmdData.get("px"));
+
+            }
+        }
     }
 
     public void update(float delta) {
@@ -121,6 +135,7 @@ public class WorldController implements InputProcessor {
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+        System.out.println("called touchUp");
         float x = this.player.getX();
         float y = this.player.getY();
         if(requestMove){

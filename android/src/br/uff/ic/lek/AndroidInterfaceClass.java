@@ -25,6 +25,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.Query;
 
 import br.uff.ic.lek.actors.Avatar;
+import br.uff.ic.lek.game.World;
 
 // para espelhar a tela de seu celular no Ubuntu
 // https://diolinux.com.br/tutoriais/espelhe-tela-do-seu-android-no-seu-linux-com-o-scrcpy.html
@@ -56,9 +57,138 @@ public class AndroidInterfaceClass extends Activity implements InterfaceAndroidF
 	int runningTimes = 0;
 	boolean newAccount;
 
+	public AndroidInterfaceClass(String playerNickName, String emailCRC32, String pwdCRC32, int runningTimes) {
+		this.playerNickName = playerNickName;
+		this.runningTimes = runningTimes;
+
+		Log.d(TAG, "construtor AndroidInterfaceClass execucoes:" +runningTimes+ " playerNickName="+playerNickName+" emailCRC32="+emailCRC32+" pwdCRC32="+pwdCRC32);
+
+		database = FirebaseDatabase.getInstance();
+		mAuth = FirebaseAuth.getInstance();
+		FirebaseUser currentUser = mAuth.getCurrentUser();
+
+		if (AndroidInterfaceClass.debugFazPrimeiraVez || currentUser == null) {
+			try {
+				this.createAccount(emailCRC32, pwdCRC32);
+				Log.d(TAG, "criou um novo auth com email:" + emailCRC32 + " pwd:" + pwdCRC32);
+				this.signIn(emailCRC32, pwdCRC32);
+				newAccount = true;
+			} catch (Exception e) {
+				Log.d(TAG, "Exception signIn " + e.getMessage());
+			}
+		} else {
+			newAccount=false;
+		}
+
+		currentUserDefined(currentUser);
+
+		updateRealTimeDatabaseUserData(currentUser);
+	}
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		mAuth = FirebaseAuth.getInstance();
+	}
+
+	@Override
+	public void onStart() {
+		super.onStart();
+		FirebaseUser currentUser = mAuth.getCurrentUser();
+//		if (currentUser != null) reload();
+	}
+
+	@Override
+	public void waitForMyMessages() {
+		int ultimosUsuarios = 10;
+
+		DatabaseReference players = referencia.child("players");
+		Query playerPesquisa = players.startAt(uID).endAt(uID).orderByChild("authUID").limitToLast(ultimosUsuarios);
+
+		playerPesquisa.addValueEventListener(
+			new ValueEventListener() {
+				@Override
+				public void onDataChange(DataSnapshot dataSnapshot) {
+					for (DataSnapshot zoneSnapshot : dataSnapshot.getChildren()) {
+						Log.d(TAG, "UID listener dos " + ultimosUsuarios + " users ordem lastUpdateTime " + zoneSnapshot.child("cmd").getValue() + " " + zoneSnapshot.child("lastUpdateTime").getValue());
+
+						if (AndroidInterfaceClass.gameLibGDX == null) return;
+
+						String registrationTime = "" + zoneSnapshot.child("registrationTime").getValue();
+						String authUID = "" + zoneSnapshot.child("authUID").getValue();
+						String cmd = "" + zoneSnapshot.child("cmd").getValue();
+						String lastUpdateTime = "" + zoneSnapshot.child("lastUpdateTime").getValue();
+						World.world.worldController.onNotification(getCmdDictionary(cmd));
+						AndroidInterfaceClass.gameLibGDX.enqueueMessage(InterfaceLibGDX.MY_PLAYER_DATA, registrationTime, authUID, cmd, lastUpdateTime);
+
+					}
+				}
+
+				@Override
+				public void onCancelled(DatabaseError databaseError) {
+					Log.i(TAG, "playerPesquisa.addValueEventListener onCancelled", databaseError.toException());
+				}
+			}
+		);
+	}
+
+	@Override
+	public void waitForPlayers(){
+		int ultimosUsuarios = 10;
+		DatabaseReference players = referencia.child("players");
+
+		Query playerPesquisa = players.startAt("READYTOPLAY_-").endAt("READYTOPLAY_~").orderByChild("stateAndLastTime").limitToLast(ultimosUsuarios);
+
+		playerPesquisa.addValueEventListener(
+			new ValueEventListener() {
+
+
+				@Override
+				public void onDataChange(DataSnapshot dataSnapshot) {
+
+					for (DataSnapshot zoneSnapshot : dataSnapshot.getChildren()) {
+						Log.d(TAG, "On DataChange for child "+zoneSnapshot.child("authUID").getValue());
+						if (AndroidInterfaceClass.gameLibGDX == null) return;
+						String registrationTime = zoneSnapshot.child("registrationTime").getValue().toString();
+						String authUID = zoneSnapshot.child("authUID").getValue().toString();
+						String lastUpdateTime = zoneSnapshot.child("lastUpdateTime").getValue().toString();
+
+						String cmd = zoneSnapshot.child("cmd").getValue().toString();
+
+						System.out.println("Teste: " + getCmdDictionary(cmd).get("event"));
+
+						AndroidInterfaceClass.gameLibGDX.enqueueMessage(InterfaceLibGDX.ALL_PLAYERS_DATA, registrationTime, authUID, cmd, lastUpdateTime);
+					}
+				}
+
+				@Override
+				public void onCancelled(DatabaseError databaseError) {
+						Log.i(TAG, "playerPesquisa.addValueEventListener onCancelled", databaseError.toException());
+				}
+			}
+		);
+	}
+
+	@Override
+	public void writePlayerData(Avatar player){
+		myRef = database.getReference("players").child(player.getAuthUID());
+		myRef.setValue(player.getFirebaseData());
+	}
+
+	@Override
+	public void setLibGDXScreen(InterfaceLibGDX iLibGDX) {
+		Log.d(TAG, "chamou setLibGDXScreen");
+		AndroidInterfaceClass.gameLibGDX = iLibGDX;
+	}
+
+	@Override
+	public void finishAndRemoveTask(){
+		this.finishAndRemoveTask();
+	}
+
 	private void createAccount(String email, String password) {
 		mAuth.createUserWithEmailAndPassword(email, password)
-			.addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+				.addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
 					@Override
 					public void onComplete(@NonNull Task<AuthResult> task) {
 						if (task.isSuccessful()) {
@@ -70,7 +200,7 @@ public class AndroidInterfaceClass extends Activity implements InterfaceAndroidF
 							updateUI(null);
 						}
 					}
-			});
+				});
 	}
 
 	private void signIn(String email, String password) {
@@ -78,32 +208,32 @@ public class AndroidInterfaceClass extends Activity implements InterfaceAndroidF
 		System.out.println("***** "+email+" ***** "+password);
 
 		mAuth.signInWithEmailAndPassword(email, password)
-			.addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-				@Override
-				public void onComplete(@NonNull Task<AuthResult> task) {
-					if (task.isSuccessful()) {
-						Log.d(TAG, "signInWithEmail:success"+email+" "+password);
-						FirebaseUser currentUser = mAuth.getCurrentUser();
-						updateUI(currentUser);
-					} else {
-						System.out.println("*********************************");
-						System.out.println("***** "+email+" ***** "+password);
-						Log.d(TAG, "signInWithEmail:failure"+email+" "+password, task.getException());
-						updateUI(null);
+				.addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+					@Override
+					public void onComplete(@NonNull Task<AuthResult> task) {
+						if (task.isSuccessful()) {
+							Log.d(TAG, "signInWithEmail:success"+email+" "+password);
+							FirebaseUser currentUser = mAuth.getCurrentUser();
+							updateUI(currentUser);
+						} else {
+							System.out.println("*********************************");
+							System.out.println("***** "+email+" ***** "+password);
+							Log.d(TAG, "signInWithEmail:failure"+email+" "+password, task.getException());
+							updateUI(null);
+						}
 					}
-				}
-			});
+				});
 	}
 
 	private void sendEmailVerification() {
 		final FirebaseUser user = mAuth.getCurrentUser();
 		user.sendEmailVerification()
-			.addOnCompleteListener(this, new OnCompleteListener<Void>() {
-				@Override
-				public void onComplete(@NonNull Task<Void> task) {
+				.addOnCompleteListener(this, new OnCompleteListener<Void>() {
+					@Override
+					public void onComplete(@NonNull Task<Void> task) {
 						// Email sent
-				}
-			});
+					}
+				});
 	}
 
 	private void updateUI(FirebaseUser currentUser) {
@@ -183,148 +313,24 @@ public class AndroidInterfaceClass extends Activity implements InterfaceAndroidF
 		}
 	}
 
-	public AndroidInterfaceClass(String playerNickName, String emailCRC32, String pwdCRC32, int runningTimes) {
-		this.playerNickName = playerNickName;
-		this.runningTimes = runningTimes;
-
-		Log.d(TAG, "construtor AndroidInterfaceClass execucoes:" +runningTimes+ " playerNickName="+playerNickName+" emailCRC32="+emailCRC32+" pwdCRC32="+pwdCRC32);
-
-		database = FirebaseDatabase.getInstance();
-		mAuth = FirebaseAuth.getInstance();
-		FirebaseUser currentUser = mAuth.getCurrentUser();
-
-		if (AndroidInterfaceClass.debugFazPrimeiraVez || currentUser == null) {
-			try {
-				this.createAccount(emailCRC32, pwdCRC32);
-				Log.d(TAG, "criou um novo auth com email:" + emailCRC32 + " pwd:" + pwdCRC32);
-				this.signIn(emailCRC32, pwdCRC32);
-				newAccount = true;
-			} catch (Exception e) {
-				Log.d(TAG, "Exception signIn " + e.getMessage());
-			}
-		} else {
-			newAccount=false;
+	private Dictionary<String,String> getCmdDictionary(String cmd) {
+		cmd = cmd.replaceAll("\\{","");
+		cmd = cmd.replaceAll("\\}","");
+		String[] params = cmd.split(",");
+		Dictionary<String,String> dictionaryParams = new Hashtable<String,String>();
+		for(String param : params){
+			String[] data = param.split(":");
+			String key = data[0];
+			String value = data[1];
+			dictionaryParams.put(key,value);
 		}
-
-		currentUserDefined(currentUser);
-
-		updateRealTimeDatabaseUserData(currentUser);
-	}
-
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		mAuth = FirebaseAuth.getInstance();
-	}
-
-	@Override
-	public void onStart() {
-		super.onStart();
-		FirebaseUser currentUser = mAuth.getCurrentUser();
-//		if (currentUser != null) reload();
-	}
-
-	@Override
-	public void waitForMyMessages() {
-		int ultimosUsuarios = 10;
-
-		DatabaseReference players = referencia.child("players");
-		Query playerPesquisa = players.startAt(uID).endAt(uID).orderByChild("authUID").limitToLast(ultimosUsuarios);
-
-		playerPesquisa.addValueEventListener(
-			new ValueEventListener() {
-				@Override
-				public void onDataChange(DataSnapshot dataSnapshot) {
-					for (DataSnapshot zoneSnapshot : dataSnapshot.getChildren()) {
-						Log.d(TAG, "UID listener dos " + ultimosUsuarios + " users ordem lastUpdateTime " + zoneSnapshot.child("cmd").getValue() + " " + zoneSnapshot.child("lastUpdateTime").getValue());
-
-						if (AndroidInterfaceClass.gameLibGDX == null) return;
-
-						String registrationTime = "" + zoneSnapshot.child("registrationTime").getValue();
-						String authUID = "" + zoneSnapshot.child("authUID").getValue();
-						String cmd = "" + zoneSnapshot.child("cmd").getValue();
-						String lastUpdateTime = "" + zoneSnapshot.child("lastUpdateTime").getValue();
-
-						AndroidInterfaceClass.gameLibGDX.enqueueMessage(InterfaceLibGDX.MY_PLAYER_DATA, registrationTime, authUID, cmd, lastUpdateTime);
-					}
-				}
-
-				@Override
-				public void onCancelled(DatabaseError databaseError) {
-					Log.i(TAG, "playerPesquisa.addValueEventListener onCancelled", databaseError.toException());
-				}
-			}
-		);
-	}
-
-	@Override
-	public void waitForPlayers(){
-		int ultimosUsuarios = 10;
-		DatabaseReference players = referencia.child("players");
-
-		Query playerPesquisa = players.startAt("READYTOPLAY_-").endAt("READYTOPLAY_~").orderByChild("stateAndLastTime").limitToLast(ultimosUsuarios);
-
-		playerPesquisa.addValueEventListener(
-			new ValueEventListener() {
-				Dictionary<String,String> getCmdDictionary(String cmd) {
-					cmd = cmd.replaceAll("\\{","");
-					cmd = cmd.replaceAll("\\}","");
-					String[] params = cmd.split(",");
-					Dictionary<String,String> dictionaryParams = new Hashtable<String,String>();
-					for(String param : params){
-						String[] data = param.split(":");
-						String key = data[0];
-						String value = data[1];
-						dictionaryParams.put(key,value);
-					}
-					System.out.println("COMANDO: "+ cmd);
-					System.out.println("DICIONARIO: "+ dictionaryParams);
-					return  dictionaryParams;
-				}
-
-				@Override
-				public void onDataChange(DataSnapshot dataSnapshot) {
-
-					for (DataSnapshot zoneSnapshot : dataSnapshot.getChildren()) {
-						Log.d(TAG, "On DataChange for child "+zoneSnapshot.child("authUID").getValue());
-						if (AndroidInterfaceClass.gameLibGDX == null) return;
-						String registrationTime = zoneSnapshot.child("registrationTime").getValue().toString();
-						String authUID = zoneSnapshot.child("authUID").getValue().toString();
-						String lastUpdateTime = zoneSnapshot.child("lastUpdateTime").getValue().toString();
-
-						String cmd = zoneSnapshot.child("cmd").getValue().toString();
-
-						System.out.println("Teste: " + getCmdDictionary(cmd).get("event"));
-
-						AndroidInterfaceClass.gameLibGDX.enqueueMessage(InterfaceLibGDX.ALL_PLAYERS_DATA, registrationTime, authUID, cmd, lastUpdateTime);
-					}
-				}
-
-				@Override
-				public void onCancelled(DatabaseError databaseError) {
-						Log.i(TAG, "playerPesquisa.addValueEventListener onCancelled", databaseError.toException());
-				}
-			}
-		);
-	}
-
-	@Override
-	public void writePlayerData(Avatar player){
-		myRef = database.getReference("players").child(player.getAuthUID());
-		myRef.setValue(player.getFirebaseData());
-	}
-
-	@Override
-	public void setLibGDXScreen(InterfaceLibGDX iLibGDX) {
-		Log.d(TAG, "chamou setLibGDXScreen");
-		AndroidInterfaceClass.gameLibGDX = iLibGDX;
-	}
-
-	@Override
-	public void finishAndRemoveTask(){
-		this.finishAndRemoveTask();
+		System.out.println("COMANDO: "+ cmd);
+		System.out.println("DICIONARIO: "+ dictionaryParams);
+		return  dictionaryParams;
 	}
 }
+
+
 
 
 
