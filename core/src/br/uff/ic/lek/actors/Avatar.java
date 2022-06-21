@@ -158,9 +158,9 @@ public class Avatar extends Sprite {
     }
 
     protected void move(float delta){
-
+        System.out.println("entrei e sou");
         if(!WorldController.clicado) return;
-
+        System.out.println("passei e sou o "+this.authUID);
         double distancia = Math.sqrt((current.x - WorldController.target.x)*(current.x - WorldController.target.x) + (current.y - WorldController.target.y)*(current.y - WorldController.target.y));
         vetorUnitarioMovimento.x = (float) ((WorldController.target.x -current.x)/distancia);
         vetorUnitarioMovimento.y = (float) ((WorldController.target.y -current.y)/distancia);
@@ -177,6 +177,7 @@ public class Avatar extends Sprite {
         defineOrientation(playerMovementAngle);
         double posx = (WorldController.target.x -current.x)/distancia * Avatar.SPEED*delta  + current.x;
         double posy = (WorldController.target.y -current.y)/distancia * Avatar.SPEED*delta  + current.y;
+        System.out.println("esse é o delta "+delta);
         current.x = (float) posx;
         current.y = (float) posy;
         this.setPosition(current.x, current.y);
@@ -188,8 +189,8 @@ public class Avatar extends Sprite {
     }
 
     protected void collide(float delta){
-
         avatarPower.setPower(avatarPower.getPower() - 0.01f);
+
 
         if(this.velocity.x > Avatar.SPEED) {
             this.velocity.x = Avatar.SPEED;
@@ -248,6 +249,7 @@ public class Avatar extends Sprite {
     }
 
     public void update(float delta) {
+
         move(delta);
         collide(delta);
     }
@@ -300,7 +302,6 @@ public class Avatar extends Sprite {
 
         batch.end();
         batch.begin();
-        avatarPower.draw(camera, this.getX(), this.getY());
     }
 
     @Override

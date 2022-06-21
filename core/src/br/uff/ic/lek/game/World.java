@@ -113,7 +113,6 @@ public class World {
 		World.atlasPlayerSW_NW_SE_NE = this.assets.get("img/guerreiraSW_NW_SE_NE_210x280.pack");
 
 		Avatar avatar = new Avatar(new Sprite(World.atlasPlayerS_W_E_N.findRegion("South02")), (avatarStartTileX)*World.tileWidth, avatarStartTileY*World.tileHeight, PlayerData.myPlayerData().getAuthUID());
-		this.createNPC();
 		World.camera = new OrthographicCamera(avatar.getX(), avatar.getY());
 		World.camera.zoom = 0.5f;
 
@@ -123,6 +122,8 @@ public class World {
 		avatar.setX(avatarStartTileX*World.tileWidth);
 		avatar.setY(avatarStartTileY*World.tileHeight);
 		this.addAvatar(avatar);
+		this.createNPC();
+
 	}
 
 	public static void load() {
@@ -226,6 +227,9 @@ public class World {
 		mensagem = "debug";
 		World.world.getAvatar().draw(camera, font, mensagem, this.tiledMapRender.getBatch());
 		this.tiledMapRender.getBatch().end();
+		this.tiledMapRender.getBatch().begin();
+		World.world.avatars.get(1).draw(camera, font, mensagem, this.tiledMapRender.getBatch());
+		this.tiledMapRender.getBatch().end();
 
 		float x = World.world.getAvatar().getX() + World.world.getAvatar().getWidth();
 		float y = World.world.getAvatar().getY() + World.world.getAvatar().getHeight();
@@ -274,6 +278,9 @@ public class World {
 	}
 
 	public List<Avatar> getAvatars(){
+		for(Avatar avatar:this.avatars){
+			System.out.println(avatar.getAuthUID());
+		}
 		return this.avatars;
 	}
 

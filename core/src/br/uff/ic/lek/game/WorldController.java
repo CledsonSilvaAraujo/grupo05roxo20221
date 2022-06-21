@@ -203,9 +203,9 @@ public class WorldController implements InputProcessor {
     }
 
     private void updateAvatars(float delta){
-        this.avatars.get(0).update(delta);
-//        for(Avatar avatar: this.avatars){
-//            avatar.update(delta);
-//        }
+
+        for(Avatar avatar: this.avatars){
+            avatar.update(delta);
+        }
     }
 }
