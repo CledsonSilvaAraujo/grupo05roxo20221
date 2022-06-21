@@ -31,7 +31,7 @@ public class AvatarNPC extends Avatar {
 
     public AvatarNPC(Sprite sprite, float x, float y, String authUID) {
 
-        super(sprite, x, y, "tulipa");
+        super(sprite, x, y, authUID);
     }
     protected void move(float delta){
 
