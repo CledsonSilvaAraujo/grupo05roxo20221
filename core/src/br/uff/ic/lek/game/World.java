@@ -43,11 +43,7 @@ import java.util.List;
 
 
 public class World {
-	private static ClassHud hud;
-	private static float mapWidthPixel;
-	private static float mapHeightPixel;
-
-	public static World world=null;
+	public static World world = null;
 	public static OrthographicCamera camera;
 	public static TweenManager tweenManager;
 	public static TextureAtlas atlasPlayerS_W_E_N;
@@ -58,17 +54,11 @@ public class World {
 	public static int tileHeight;
 	public static int avatarStartTileX;
 	public static int avatarStartTileY;
-	public static String mensagem;
 	public static int maxNumberOfAvatars = 4;
 
-	private CameraController controller;
-	private GestureDetector gestureDetector;
-	private CameraZoomAdjust cameraZoomAdjust;
-	private OrthogonalTiledMapRenderer tiledMapRender;
-	private AssetManager assets;
-	private float count=100.0f;
-	private BitmapFont font;
-	private List<Avatar> avatars = new ArrayList<Avatar>();
+	private static ClassHud hud;
+	private static float mapWidthPixel;
+	private static float mapHeightPixel;
 
 	public WorldController worldController;
 	public InputMultiplexer inputMultiplexer;
@@ -77,12 +67,22 @@ public class World {
 	public Music backgroundMusic;
 	public PathPlanning pathPlan;
 
+	private List<Avatar> avatars = new ArrayList<Avatar>();
+	private Avatar player;
+	private CameraController controller;
+	private GestureDetector gestureDetector;
+	private CameraZoomAdjust cameraZoomAdjust;
+	private OrthogonalTiledMapRenderer tiledMapRender;
+	private AssetManager assets;
+	private BitmapFont font;
+	private float count = 100.0f;
+
 	private World() {
 		ClassToast.initToastFactory();
 		Color backgroundColor = new Color(0f, 0f, 0f, 0.5f);
 		Color fontColor = new Color(1, 1, 0, 0.5f);
-		String msg = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.";
-		ClassToast.toastRich(msg, backgroundColor, fontColor, 2f);
+
+		ClassToast.toastRich("starting my world!", backgroundColor, fontColor, 2f);
 
 		this.map = new TmxMapLoader().load("maps/alchemy.tmx");
 		World.bounds = new ArrayList<Rectangle>();
@@ -109,21 +109,21 @@ public class World {
 		this.assets.load("img/guerreiraS_W_E_N_210x280.pack", TextureAtlas.class);
 		this.assets.load("img/guerreiraSW_NW_SE_NE_210x280.pack", TextureAtlas.class);
 		this.assets.finishLoading();
+
 		World.atlasPlayerS_W_E_N = this.assets.get("img/guerreiraS_W_E_N_210x280.pack");
 		World.atlasPlayerSW_NW_SE_NE = this.assets.get("img/guerreiraSW_NW_SE_NE_210x280.pack");
 
-		Avatar avatar = new Avatar(new Sprite(World.atlasPlayerS_W_E_N.findRegion("South02")), (avatarStartTileX)*World.tileWidth, avatarStartTileY*World.tileHeight, PlayerData.myPlayerData().getAuthUID());
-		World.camera = new OrthographicCamera(avatar.getX(), avatar.getY());
+		this.createPlayer();
+		this.createNPC();
+		
+		World.camera = new OrthographicCamera(this.player.getX(), this.player.getY());
 		World.camera.zoom = 0.5f;
 
 		pathPlan = new PathPlanning(this);
 		pathPlan.create();
 
-		avatar.setX(avatarStartTileX*World.tileWidth);
-		avatar.setY(avatarStartTileY*World.tileHeight);
-		this.addAvatar(avatar);
-		this.createNPC();
-
+		this.player.setX(avatarStartTileX*World.tileWidth);
+		this.player.setY(avatarStartTileY*World.tileHeight);
 	}
 
 	public static void load() {
@@ -149,7 +149,6 @@ public class World {
 		World.camera.update();
 		world.font = new BitmapFont();
 		world.font.setColor(Color.RED);
-		mensagem="debug";
 		world.cameraZoomAdjust = new CameraZoomAdjust(0.1f, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		Tween.registerAccessor(OrthographicCamera.class, new ClassMyCameraAccessor());
 	}
@@ -204,11 +203,7 @@ public class World {
 	}
 
 	public static float getMapHeightPixel() {
-			return World.mapHeightPixel;
-	}
-
-	public static ArrayList<Rectangle> getBounds() {
-		return bounds;
+		return World.mapHeightPixel;
 	}
 
 	public void render(float delta) {
@@ -221,21 +216,21 @@ public class World {
 		this.tiledMapRender.setView(World.camera);
 		this.tiledMapRender.render();
 
-		cameraZoomAdjust.multitouch(World.camera, delta);// para fazer map zoom in & out
+		cameraZoomAdjust.multitouch(World.camera, delta);
 
-		this.tiledMapRender.getBatch().begin();
-		mensagem = "debug";
-		World.world.getAvatar().draw(camera, font, mensagem, this.tiledMapRender.getBatch());
-		this.tiledMapRender.getBatch().end();
-		this.tiledMapRender.getBatch().begin();
-		World.world.avatars.get(1).draw(camera, font, mensagem, this.tiledMapRender.getBatch());
-		this.tiledMapRender.getBatch().end();
+		for (Avatar avatar : this.avatars) {
+			this.tiledMapRender.getBatch().begin();
+			avatar.draw(camera, font, "debug", this.tiledMapRender.getBatch());
+			this.tiledMapRender.getBatch().end();
+		}
 
 		float x = World.world.getAvatar().getX() + World.world.getAvatar().getWidth();
 		float y = World.world.getAvatar().getY() + World.world.getAvatar().getHeight();
+
 		World.world.pathPlan.render(delta);
 
 		batch.setProjectionMatrix(World.world.hud.stage.getCamera().combined);
+
 		World.world.hud.stage.draw();
 
 		Matrix4 uiMatrix = World.camera.combined.cpy();
@@ -260,11 +255,18 @@ public class World {
 			World.bounds = bounds;
 	}
 
-	private int getAvatarsTotal(){
+	public List<Avatar> getAvatars() {
+		for(Avatar avatar:this.avatars){
+			System.out.println(avatar.getAuthUID());
+		}
+		return this.avatars;
+	}
+
+	private int getAvatarsTotal() {
 		return this.avatars.size();
 	}
 
-	private void addAvatar(Avatar avatar){
+	private void addAvatar(Avatar avatar) {
 		if (this.getAvatarsTotal() == World.maxNumberOfAvatars) {
 			System.out.println("Limit of Avatars reached");
 			return;
@@ -272,18 +274,25 @@ public class World {
 		this.avatars.add(avatar);
 	}
 
-	private void createNPC(){
-		AvatarNPC npc = new AvatarNPC(new Sprite(World.atlasPlayerS_W_E_N.findRegion("South02")), (avatarStartTileX)*World.tileWidth, avatarStartTileY*World.tileHeight, "A");
+	private void createPlayer() {
+		Avatar player = new Avatar(
+			new Sprite(World.atlasPlayerS_W_E_N.findRegion("South02")),
+			(avatarStartTileX)*World.tileWidth, avatarStartTileY*World.tileHeight,
+			PlayerData.myPlayerData().getAuthUID()
+		);
+		this.player = player;
+		this.addAvatar(player);
+	}
+
+	private void createNPC() {
+		AvatarNPC npc = new AvatarNPC(
+			new Sprite(World.atlasPlayerS_W_E_N.findRegion("South02")),
+			(avatarStartTileX)*World.tileWidth,
+			avatarStartTileY*World.tileHeight,
+			"A"
+		);
 		this.addAvatar(npc);
 	}
-
-	public List<Avatar> getAvatars(){
-		for(Avatar avatar:this.avatars){
-			System.out.println(avatar.getAuthUID());
-		}
-		return this.avatars;
-	}
-
 }
 
 class CameraController implements GestureDetector.GestureListener {

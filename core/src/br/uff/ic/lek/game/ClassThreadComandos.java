@@ -32,37 +32,14 @@ public class ClassThreadComandos extends Thread implements InterfaceLibGDX {
 	public static InterfaceAndroidFireBase objetoAndroidFireBase;
 	public static Alquimia screenJogo;
 
-	private int contador =0;
-	private final int lineNumber=1;
+	private int contador = 0;
+	private final int lineNumber = 1;
 
 	public ClassThreadComandos(Alquimia screenJogo) {
 		ClassThreadComandos.screenJogo = screenJogo;
 
 		ClassThreadComandos.objetoAndroidFireBase.setLibGDXScreen(this);
 		this.start();
-	}
-
-	private void processaCmd(ClassComandos elementoFilaComandos) {
-		String cmd = elementoFilaComandos.getCmd();
-		String querySource = elementoFilaComandos.getQuerySource();
-
-		if (querySource == InterfaceLibGDX.MY_PLAYER_DATA) {
-			Color backgroundColor = new Color(1f, 1f, 1f, 0.9f);
-			Color fontColor = new Color(1, 0, 0, 0.9f);
-			ClassToast.toastRich(
-				querySource + " " + cmd,
-				backgroundColor, fontColor, ClassToast.LONG
-			);
-		} else {
-			Color backgroundColor = new Color(0f, 0f, 0f, 0.9f);
-			Color fontColor = new Color(1, 1, 1, 0.9f);
-			ClassToast.toastRich(
-				querySource + " " + cmd,
-				backgroundColor, fontColor, ClassToast.LONG
-			);
-		}
-
-		parseCmd(elementoFilaComandos.getAuthUID(), cmd);
 	}
 
 	@Override
@@ -116,5 +93,28 @@ public class ClassThreadComandos extends Thread implements InterfaceLibGDX {
 			" cardNumber=" + ((ClassMessage) obj).getCardNumber() +
 			" uID=" + ((ClassMessage) obj).getuID()
 		);
+	}
+
+	private void processaCmd(ClassComandos elementoFilaComandos) {
+		String cmd = elementoFilaComandos.getCmd();
+		String querySource = elementoFilaComandos.getQuerySource();
+
+		if (querySource == InterfaceLibGDX.MY_PLAYER_DATA) {
+			Color backgroundColor = new Color(1f, 1f, 1f, 0.9f);
+			Color fontColor = new Color(1, 0, 0, 0.9f);
+			ClassToast.toastRich(
+				querySource + " " + cmd,
+				backgroundColor, fontColor, ClassToast.LONG
+			);
+		} else {
+			Color backgroundColor = new Color(0f, 0f, 0f, 0.9f);
+			Color fontColor = new Color(1, 1, 1, 0.9f);
+			ClassToast.toastRich(
+				querySource + " " + cmd,
+				backgroundColor, fontColor, ClassToast.LONG
+			);
+		}
+
+		parseCmd(elementoFilaComandos.getAuthUID(), cmd);
 	}
 }

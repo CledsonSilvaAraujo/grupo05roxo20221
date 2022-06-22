@@ -1,18 +1,3 @@
-/*
-    Fábrica de Software para Educação
-    Professor Lauro Kozovits, D.Sc.
-    ProfessorKozovits@gmail.com
-    Universidade Federal Fluminense, UFF
-    Rio de Janeiro, Brasil
-    Subprojeto: Alchemie Zwei
-
-    Partes do software registradas no INPI como integrantes de alguns apps para smartphones
-    Copyright @ 2016..2022
-
-    Se você deseja usar partes do presente software em seu projeto, por favor mantenha esse cabeçalho e peça autorização de uso.
-    If you wish to use parts of this software in your project, please keep this header and ask for authorization to use.
-
- */
 package br.uff.ic.lek;
 
 import static com.badlogic.gdx.math.MathUtils.random;
@@ -21,35 +6,9 @@ import com.badlogic.gdx.math.MathUtils;
 
 import java.sql.Timestamp;
 
-/*
-Ao gravar no inicio os dados de um jogador, gero e guardo
-o timestamp (equivalente ao "now") do Firebase.
-De posse desse valor e do tempo inicial ao capturar localmente
-eu tenho como estimar e guardar com boa segurança o tempo
-no servidor via cálculo:
- tempo estimado do servidor = "now obtido" + (tempoAtualLocal - tempoInicialLocal)
-
-Cada jogador tem um número aleatório que é permamentemente gerado
-pelo software a cada inicialização e atualizado no servidor.
-Esse número permite
-que o jogador resultante de uma query (de até 10 players disponíveis)
-escolha seu match segundo a seguinte lógica:
-partida será realizada entre os jogadores com
-min(ABS(numPlayer1 - numPlayer2))
-jogador com numPlayer maior faz o convite e estabelece o match
-e o outro começa a partida (faz a 1a jogada).
-Dessa forma, fica fácil para Player1 e Player2 saberem que a lógica
-da partida dar-se-á entre esses dois e não outro.
-Naturalmente, há o risco de entrar um jogador
-novo entre a query de Player1 e Player2, mas o timeout, a não resposta
-avisa ao Player1 que Player2 não quer jogar ou decidiu jogar com outro
-Na falta de jogadores, entra a mensagem "quer esperar por jogadores
-ou jogar com um robot?"
- */
 public class PlayerData {
-    // veja https://firebase.google.com/docs/database/android/read-and-write
-    String authUID;// UID do usuario registrado, chave da coleção
-    String writerUID;// UID do usuario que escreveu, pode ser ele próprio ou outro jogador
+    String authUID;
+    String writerUID;
     States gameState;
     String chat;
     String cmd;
