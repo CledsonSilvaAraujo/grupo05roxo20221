@@ -54,7 +54,7 @@ public class AndroidLauncher extends AndroidApplication {
 
 		runningTimes = sh.getInt("runningTimes", 0);
 
-		if (AndroidInterfaceClass.debugFazPrimeiraVez || "".equals(savedPlayerNickName)) {
+		if ("".equals(savedPlayerNickName)) {
 			runningTimes = 1;
 
 			SharedPreferences sharedPreferences = getSharedPreferences(sharedPreferencesName, Context.MODE_PRIVATE);

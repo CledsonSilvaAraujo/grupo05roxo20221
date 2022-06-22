@@ -34,28 +34,23 @@ import br.uff.ic.lek.game.World;
 public class AndroidInterfaceClass extends Activity implements InterfaceAndroidFireBase {
 	private static final String TAG = "JOGO";
 
-	public static final boolean debugFazPrimeiraVez = false;
-	public static InterfaceLibGDX gameLibGDX = null;
+	private static InterfaceLibGDX gameLibGDX = null;
 
+	private FirebaseDatabase database;
+	private DatabaseReference myRef;
+	private DatabaseReference myRefInicial;
+	private DatabaseReference referencia = FirebaseDatabase.getInstance().getReference();
 	private FirebaseAuth mAuth;
 
+	private String providerID = "";
+	private String uID = "";
+	private String email = "";
+	private String pwd = "";
+	private String playerNickName = "";
+
+	private boolean newAccount;
+	private int runningTimes = 0;
 	private int fazSoUmaVez=0;
-
-	public boolean waitingForTheFirstTime = false;
-
-	FirebaseDatabase database;
-	DatabaseReference myRef;
-	DatabaseReference myRefInicial;
-	DatabaseReference referencia = FirebaseDatabase.getInstance().getReference();
-
-	String providerID = "";
-	String uID = "";
-	String email = "";
-	String pwd = "";
-	String playerNickName = "";
-
-	int runningTimes = 0;
-	boolean newAccount;
 
 	public AndroidInterfaceClass(String playerNickName, String emailCRC32, String pwdCRC32, int runningTimes) {
 		this.playerNickName = playerNickName;
@@ -67,7 +62,7 @@ public class AndroidInterfaceClass extends Activity implements InterfaceAndroidF
 		mAuth = FirebaseAuth.getInstance();
 		FirebaseUser currentUser = mAuth.getCurrentUser();
 
-		if (AndroidInterfaceClass.debugFazPrimeiraVez || currentUser == null) {
+		if (currentUser == null) {
 			try {
 				this.createAccount(emailCRC32, pwdCRC32);
 				Log.d(TAG, "criou um novo auth com email:" + emailCRC32 + " pwd:" + pwdCRC32);
@@ -95,7 +90,6 @@ public class AndroidInterfaceClass extends Activity implements InterfaceAndroidF
 	public void onStart() {
 		super.onStart();
 		FirebaseUser currentUser = mAuth.getCurrentUser();
-//		if (currentUser != null) reload();
 	}
 
 	@Override
@@ -118,9 +112,10 @@ public class AndroidInterfaceClass extends Activity implements InterfaceAndroidF
 						String authUID = "" + zoneSnapshot.child("authUID").getValue();
 						String cmd = "" + zoneSnapshot.child("cmd").getValue();
 						String lastUpdateTime = "" + zoneSnapshot.child("lastUpdateTime").getValue();
+						
 						World.world.worldController.onNotification(getCmdDictionary(cmd));
-						AndroidInterfaceClass.gameLibGDX.enqueueMessage(InterfaceLibGDX.MY_PLAYER_DATA, registrationTime, authUID, cmd, lastUpdateTime);
 
+						AndroidInterfaceClass.gameLibGDX.enqueueMessage(InterfaceLibGDX.MY_PLAYER_DATA, registrationTime, authUID, cmd, lastUpdateTime);
 					}
 				}
 
@@ -141,11 +136,8 @@ public class AndroidInterfaceClass extends Activity implements InterfaceAndroidF
 
 		playerPesquisa.addValueEventListener(
 			new ValueEventListener() {
-
-
 				@Override
 				public void onDataChange(DataSnapshot dataSnapshot) {
-
 					for (DataSnapshot zoneSnapshot : dataSnapshot.getChildren()) {
 						Log.d(TAG, "On DataChange for child "+zoneSnapshot.child("authUID").getValue());
 						if (AndroidInterfaceClass.gameLibGDX == null) return;
@@ -177,7 +169,6 @@ public class AndroidInterfaceClass extends Activity implements InterfaceAndroidF
 
 	@Override
 	public void setLibGDXScreen(InterfaceLibGDX iLibGDX) {
-		Log.d(TAG, "chamou setLibGDXScreen");
 		AndroidInterfaceClass.gameLibGDX = iLibGDX;
 	}
 
@@ -188,19 +179,19 @@ public class AndroidInterfaceClass extends Activity implements InterfaceAndroidF
 
 	private void createAccount(String email, String password) {
 		mAuth.createUserWithEmailAndPassword(email, password)
-				.addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-					@Override
-					public void onComplete(@NonNull Task<AuthResult> task) {
-						if (task.isSuccessful()) {
-							Log.d(TAG, "createUserWithEmail:success");
-							FirebaseUser currentUser = mAuth.getCurrentUser();
-							updateUI(currentUser);
-						} else {
-							Log.w(TAG, "createUserWithEmail:failure", task.getException());
-							updateUI(null);
-						}
+			.addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+				@Override
+				public void onComplete(@NonNull Task<AuthResult> task) {
+					if (task.isSuccessful()) {
+						Log.d(TAG, "createUserWithEmail:success");
+						FirebaseUser currentUser = mAuth.getCurrentUser();
+						updateUI(currentUser);
+					} else {
+						Log.w(TAG, "createUserWithEmail:failure", task.getException());
+						updateUI(null);
 					}
-				});
+				}
+			});
 	}
 
 	private void signIn(String email, String password) {
@@ -208,32 +199,31 @@ public class AndroidInterfaceClass extends Activity implements InterfaceAndroidF
 		System.out.println("***** "+email+" ***** "+password);
 
 		mAuth.signInWithEmailAndPassword(email, password)
-				.addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-					@Override
-					public void onComplete(@NonNull Task<AuthResult> task) {
-						if (task.isSuccessful()) {
-							Log.d(TAG, "signInWithEmail:success"+email+" "+password);
-							FirebaseUser currentUser = mAuth.getCurrentUser();
-							updateUI(currentUser);
-						} else {
-							System.out.println("*********************************");
-							System.out.println("***** "+email+" ***** "+password);
-							Log.d(TAG, "signInWithEmail:failure"+email+" "+password, task.getException());
-							updateUI(null);
-						}
+			.addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+				@Override
+				public void onComplete(@NonNull Task<AuthResult> task) {
+					if (task.isSuccessful()) {
+						Log.d(TAG, "signInWithEmail:success"+email+" "+password);
+						FirebaseUser currentUser = mAuth.getCurrentUser();
+						updateUI(currentUser);
+					} else {
+						System.out.println("*********************************");
+						System.out.println("***** "+email+" ***** "+password);
+						Log.d(TAG, "signInWithEmail:failure"+email+" "+password, task.getException());
+						updateUI(null);
 					}
-				});
+				}
+			});
 	}
 
 	private void sendEmailVerification() {
 		final FirebaseUser user = mAuth.getCurrentUser();
 		user.sendEmailVerification()
-				.addOnCompleteListener(this, new OnCompleteListener<Void>() {
-					@Override
-					public void onComplete(@NonNull Task<Void> task) {
-						// Email sent
-					}
-				});
+			.addOnCompleteListener(this, new OnCompleteListener<Void>() {
+				@Override
+				public void onComplete(@NonNull Task<Void> task) {
+				}
+			});
 	}
 
 	private void updateUI(FirebaseUser currentUser) {
@@ -317,15 +307,18 @@ public class AndroidInterfaceClass extends Activity implements InterfaceAndroidF
 		cmd = cmd.replaceAll("\\{","");
 		cmd = cmd.replaceAll("\\}","");
 		String[] params = cmd.split(",");
+
 		Dictionary<String,String> dictionaryParams = new Hashtable<String,String>();
-		for(String param : params){
+
+		for(String param : params) {
 			String[] data = param.split(":");
 			String key = data[0];
 			String value = data[1];
 			dictionaryParams.put(key,value);
 		}
-		System.out.println("COMANDO: "+ cmd);
-		System.out.println("DICIONARIO: "+ dictionaryParams);
+
+		System.out.println("original command: "+ cmd);
+		System.out.println("command in dictionary: "+ dictionaryParams);
 		return  dictionaryParams;
 	}
 }
