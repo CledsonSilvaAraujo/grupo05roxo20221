@@ -125,23 +125,22 @@ public class WorldController implements InputProcessor {
         float y = this.player.getY();
         if(requestMove){
             this.world.getAvatar().setState(State.WALKING);
-            WorldController.vec = new Vector3(screenX, screenY, 0);
-            this.camera.unproject(vec);
-            WorldController.target = new Vector3(vec);
-            if (Math.abs(WorldController.target.x - x) > Math.abs(WorldController.target.y - y)){
-                if ((WorldController.target.x - x) > 0){
+            Vector3 target = new Vector3(screenX, screenY, 0);
+            this.camera.unproject(target);
+            if (Math.abs(target.x - x) > Math.abs(target.y - y)){
+                if ((target.x - x) > 0){
                     this.player.setOrientation(Avatar.Compass.EAST);
                 } else {
                     this.player.setOrientation(Avatar.Compass.WEST);
                 }
             } else {
-                if ((WorldController.target.y - y) > 0){
+                if ((target.y - y) > 0){
                     this.player.setOrientation(Avatar.Compass.NORTH);
                 } else {
                     this.player.setOrientation(Avatar.Compass.SOUTH);
                 }
             }
-
+            this.player.setTarget(target);
             WorldController.clicado = true;
             world.pathPlan.targetChanged(screenX, screenY);
             fezTouchDown = false;

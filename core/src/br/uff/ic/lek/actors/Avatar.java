@@ -32,10 +32,8 @@ public class Avatar extends Sprite {
     private Vector3 vetorUnitarioMovimento;
     private double playerMovementAngle;
     public static float SPEED = 128f;
-    private Vector3 velocity = new Vector3();
-    private Vector3 temp = new Vector3(0,0,0);
-    private Vector3 current = new Vector3(0,0,0);
-    private Vector3 goodPos = new Vector3(0,0,0);
+    private Vector3 speed = new Vector3();
+    private Vector3 position = new Vector3(0,0,0);
     private Vector3 target = new Vector3(0,0,0);
     private Animation walkingWest;
     private Animation walkingEast;
@@ -64,9 +62,9 @@ public class Avatar extends Sprite {
         this.setPosition(x, y);
         this.authUID = authUID;
         this.avatarPower = new AvatarPower(100.0f);
-        temp.x = x;
-        temp.y = y;
-        temp.z = (float) 0.0;
+        position.x = x;
+        position.y = y;
+        position.z = (float) 0.0;
         this.state = State.IDLE;
         this.orientation = Compass.SOUTH;
 
@@ -136,6 +134,10 @@ public class Avatar extends Sprite {
         this.target.y=y;
     }
 
+    public void setTarget(Vector3 target){
+        this.target=target;
+    }
+
     public Compass getOrientation(){
         return orientation;
     }
@@ -164,10 +166,14 @@ public class Avatar extends Sprite {
     }
 
     protected void move(float delta){
-        if(!WorldController.clicado) return;
-        double distancia = Math.sqrt((current.x - WorldController.target.x)*(current.x - WorldController.target.x) + (current.y - WorldController.target.y)*(current.y - WorldController.target.y));
-        vetorUnitarioMovimento.x = (float) ((WorldController.target.x -current.x)/distancia);
-        vetorUnitarioMovimento.y = (float) ((WorldController.target.y -current.y)/distancia);
+        if(this.isInTarget()){
+            this.setState(State.IDLE);
+            return;
+        }
+
+        double distancia = Math.sqrt((position.x - this.target.x)*(position.x - this.target.x) + (position.y - this.target.y)*(position.y - this.target.y));
+        vetorUnitarioMovimento.x = (float) ((this.target.x -position.x)/distancia);
+        vetorUnitarioMovimento.y = (float) ((this.target.y -position.y)/distancia);
         double angulo1 = Math.acos((double) vetorUnitarioMovimento.x )*180.0/Math.PI;
         double angulo2 = Math.asin((double) vetorUnitarioMovimento.y )*180.0/Math.PI;
 
@@ -179,39 +185,35 @@ public class Avatar extends Sprite {
         }
 
         defineOrientation(playerMovementAngle);
-        double posx = (WorldController.target.x -current.x)/distancia * Avatar.SPEED*delta  + current.x;
-        double posy = (WorldController.target.y -current.y)/distancia * Avatar.SPEED*delta  + current.y;
-        current.x = (float) posx;
-        current.y = (float) posy;
-        this.setPosition(current.x, current.y);
+        double posx = (this.target.x -position.x)/distancia * Avatar.SPEED*delta  + position.x;
+        double posy = (this.target.y -position.y)/distancia * Avatar.SPEED*delta  + position.y;
+        position.x = (float) posx;
+        position.y = (float) posy;
+        this.setPosition(position.x, position.y);
         this.setState(State.WALKING);
-        if(this.current.dst(WorldController.target.x, WorldController.target.y, 0) < 32/2) {
-            WorldController.clicado = false;
-            this.setState(State.IDLE);
-        }
+    }
+
+    protected boolean isInTarget(){
+        return this.position.dst(this.target.x, this.target.y, 0) < 32/2;
     }
 
     protected void collide(float delta){
         avatarPower.setPower(avatarPower.getPower() - 0.01f);
 
 
-        if(this.velocity.x > Avatar.SPEED) {
-            this.velocity.x = Avatar.SPEED;
+        if(this.speed.x > Avatar.SPEED) {
+            this.speed.x = Avatar.SPEED;
         }
-        if(this.velocity.x < -Avatar.SPEED) {
-            this.velocity.x = -Avatar.SPEED;
+        if(this.speed.x < -Avatar.SPEED) {
+            this.speed.x = -Avatar.SPEED;
         }
-        if(this.velocity.y > Avatar.SPEED) {
-            this.velocity.y = Avatar.SPEED;
+        if(this.speed.y > Avatar.SPEED) {
+            this.speed.y = Avatar.SPEED;
         }
-        if(this.velocity.y < -Avatar.SPEED) {
-            this.velocity.y = -Avatar.SPEED;
+        if(this.speed.y < -Avatar.SPEED) {
+            this.speed.y = -Avatar.SPEED;
         }
-
-        temp.x = this.getX();
-        temp.y = this.getY();
-        current = temp;
-
+        
         if(Gdx.input.isPeripheralAvailable(Peripheral.Accelerometer)) {
             tempoAcumulado += delta;
             if (tempoAcumulado > 1.0){
@@ -219,33 +221,30 @@ public class Avatar extends Sprite {
             }
         }
 
-        if(houveColisao == false){
-            goodPos.x = (int) current.x;
-            goodPos.y = (int) current.y;
-        }
+
         if(this.getX() < 0) {
             Gdx.input.vibrate(50);
             this.setX(1);
-            temp.x = this.getX();
+            position.x = this.getX();
             this.getVelocity().x = 0;
             this.setState(State.IDLE);
         } else if(this.getX() > (World.getMapWidthPixel() - this.getWidth())) {
             Gdx.input.vibrate(50);
             this.setX(World.getMapWidthPixel() - this.getWidth() - 1);
-            temp.x = this.getX();
+            position.x = this.getX();
             this.getVelocity().x = 0;
             this.setState(State.IDLE);
         }
         if(this.getY() < 0) {
             Gdx.input.vibrate(50);
             this.setY(1);
-            temp.y = this.getY();
+            position.y = this.getY();
             this.getVelocity().y = 0;
             this.setState(State.IDLE);
         } else if(this.getY() > (World.getMapHeightPixel() - this.getHeight())) {
             Gdx.input.vibrate(50);
             this.setY(World.getMapHeightPixel() - this.getHeight() -1);
-            temp.y = this.getY();
+            position.y = this.getY();
             this.getVelocity().y = 0;
             this.setState(State.IDLE);
         }
@@ -328,7 +327,7 @@ public class Avatar extends Sprite {
     }
 
     public Vector3 getVelocity() {
-        return velocity;
+        return speed;
     }
 
     public PlayerData getFirebaseData(){
