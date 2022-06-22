@@ -41,7 +41,8 @@ public class Avatar extends Sprite {
 	private float elapsedTime;
 	private float tempoAcumulado;
 	private double playerMovementAngle;
-	
+
+	private TextureRegion currentFrame;
 	private Animation walkingWest;
 	private Animation walkingEast;
 	private Animation walkingNorth;
@@ -58,7 +59,6 @@ public class Avatar extends Sprite {
 	private TextureRegion[] walkingNorthWestFrames = new TextureRegion[3];
 	private TextureRegion[] walkingSouthEastFrames = new TextureRegion[3];
 	private TextureRegion[] walkingNorthEastFrames = new TextureRegion[3];
-	private TextureRegion currentFrame;
 	
 
 	public Avatar(Sprite sprite, float x, float y, String authUID) {
