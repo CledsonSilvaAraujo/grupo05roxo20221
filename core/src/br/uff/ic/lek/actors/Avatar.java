@@ -81,6 +81,7 @@ public class Avatar extends Sprite {
 		walkingWestFrames[1] = World.atlasPlayerS_W_E_N.findRegion("West02");
 		walkingWestFrames[2] = World.atlasPlayerS_W_E_N.findRegion("West03");
 		this.walkingWest = new Animation<>(0.1f, walkingWestFrames);
+		
 		walkingEastFrames[0] = World.atlasPlayerS_W_E_N.findRegion("East01");
 		walkingEastFrames[1] = World.atlasPlayerS_W_E_N.findRegion("East02");
 		walkingEastFrames[2] = World.atlasPlayerS_W_E_N.findRegion("East03");
