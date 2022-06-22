@@ -2,7 +2,6 @@ package br.uff.ic.lek.actors;
 
 import br.uff.ic.lek.PlayerData;
 import br.uff.ic.lek.game.World;
-import br.uff.ic.lek.game.WorldController;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Peripheral;
@@ -18,16 +17,16 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 
-enum Compass {
-	SOUTH, NORTH, WEST, EAST, SOUTH_WEST, NORTH_WEST, SOUTH_EAST, NORTH_EAST
-}
-
-enum State {
-	IDLE, WALKING, DYING
-}
-
 public class Avatar extends Sprite {
 	public static final float MAX_SPEED = 128f;
+
+	public enum Compass {
+		SOUTH, NORTH, WEST, EAST, SOUTH_WEST, NORTH_WEST, SOUTH_EAST, NORTH_EAST
+	}
+	
+	public enum State {
+		IDLE, WALKING, DYING
+	}
 
 	private String authUID;
 	private State state = State.IDLE;
@@ -43,18 +42,18 @@ public class Avatar extends Sprite {
 	private double playerMovementAngle;
 
 	private TextureRegion currentFrame;
-	private Animation walkingWest;
-	private Animation walkingEast;
-	private Animation walkingNorth;
-	private Animation walkingSouth;
+	private Animation<TextureRegion> walkingWest;
+	private Animation<TextureRegion> walkingEast;
+	private Animation<TextureRegion> walkingNorth;
+	private Animation<TextureRegion> walkingSouth;
 	private TextureRegion[] walkingWestFrames = new TextureRegion[3];
 	private TextureRegion[] walkingEastFrames = new TextureRegion[3];
 	private TextureRegion[] walkingNorthFrames = new TextureRegion[3];
 	private TextureRegion[] walkingSouthFrames = new TextureRegion[3];
-	private Animation walkingSouthWest;
-	private Animation walkingNorthWest;
-	private Animation walkingSouthEast;
-	private Animation walkingNorthEast;
+	private Animation<TextureRegion> walkingSouthWest;
+	private Animation<TextureRegion> walkingNorthWest;
+	private Animation<TextureRegion> walkingSouthEast;
+	private Animation<TextureRegion> walkingNorthEast;
 	private TextureRegion[] walkingSouthWestFrames = new TextureRegion[3];
 	private TextureRegion[] walkingNorthWestFrames = new TextureRegion[3];
 	private TextureRegion[] walkingSouthEastFrames = new TextureRegion[3];
@@ -115,8 +114,8 @@ public class Avatar extends Sprite {
 	}
 
 	public void update(float delta) {
-		move(delta);
-		collide(delta);
+		this.move(delta);
+		this.collide(delta);
 	}
 
 	public void draw(OrthographicCamera camera, BitmapFont font, String mensagem, Batch batch) {
@@ -193,19 +192,20 @@ public class Avatar extends Sprite {
 		pd.setWriterUID(this.authUID);
 		pd.setGameState(PlayerData.States.READYTOPLAY);
 		pd.setChat("empty");
+
 		class CmdObject {
-			Float px;
-			Float py;
-			String event;
-			String comando;
+			private String command;
+
 			public CmdObject(Float px, Float py,String event){
-				this.px = px;
-				this.py = py;
-				this.event = event;
-				this.comando = "{cmd:"+event+",px:"+ px +",py:"+py+"}";
+				this.command = "{cmd:"+event+",px:"+ px +",py:"+py+"}";
+			}
+
+			public String getCommand() {
+				return this.command;
 			}
 		};
-		pd.setCmd(new CmdObject(this.getX(),this.getY(),"Question").comando);
+
+		pd.setCmd(new CmdObject(this.getX(),this.getY(),"Question").getCommand());
 		pd.setAvatarType("A");
 		return pd;
 	}

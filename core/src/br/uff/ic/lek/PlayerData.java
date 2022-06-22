@@ -1,7 +1,5 @@
 package br.uff.ic.lek;
 
-import static com.badlogic.gdx.math.MathUtils.random;
-
 import com.badlogic.gdx.math.MathUtils;
 
 import java.sql.Timestamp;

@@ -1,8 +1,5 @@
 package br.uff.ic.lek.pathfinder;
 
-
-import br.uff.ic.lek.pathfinder.CollapsableWindow;
-import br.uff.ic.lek.pathfinder.PathFinderTests;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;

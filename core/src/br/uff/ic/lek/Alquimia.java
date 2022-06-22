@@ -20,10 +20,9 @@ import br.uff.ic.lek.screens.SplashScreen;
 import br.uff.ic.lek.game.World;
 
 import com.badlogic.gdx.Game;
-import com.badlogic.gdx.ApplicationListener;
 
 
-public class Alquimia extends Game implements ApplicationListener {
+public class Alquimia extends Game {
 	public Alquimia(InterfaceAndroidFireBase objetoAndroidFireBase) {
 		ClassThreadComandos.objetoAndroidFireBase = objetoAndroidFireBase;
 		ClassThreadComandos.produtorConsumidor = new ClassThreadComandos(this);

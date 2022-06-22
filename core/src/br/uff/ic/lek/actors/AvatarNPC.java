@@ -21,11 +21,7 @@ Ainda não planejado. É preciso estudar os steering behaviors da LibGDX
  */
 
 package br.uff.ic.lek.actors;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import br.uff.ic.lek.actors.Avatar;
 
 public class AvatarNPC extends Avatar {
 

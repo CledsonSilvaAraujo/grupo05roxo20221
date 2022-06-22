@@ -1,10 +1,8 @@
 package br.uff.ic.lek.pathfinder;
 
-import br.uff.ic.lek.pathfinder.GdxAiTest;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -114,15 +112,10 @@ public class PathFinderTests extends GdxAiTest {
 
 		skin = new Skin(Gdx.files.internal("data/uiskin.json"));
 
-		// Enable color markup
-		BitmapFont font = skin.get("default-font", BitmapFont.class);
-		//LEK metodo deprecado font.setMarkupEnabled(true);
-
 		stage = new Stage();
 		stage.setDebugAll(DEBUG_STAGE);
 		stageWidth = stage.getWidth();
 		stageHeight = stage.getHeight();
-		
 
 		Gdx.input.setInputProcessor(new InputMultiplexer(stage));
 
@@ -132,11 +125,9 @@ public class PathFinderTests extends GdxAiTest {
 		testsTable = new Table();
 		stack.add(testsTable);
 
-		// Create behavior selection window
 		List<String> testList = createTestList();
 		algorithmSelectionWindow = addBehaviorSelectionWindow("Path Finder Tests", testList, 0, -1);
 
-		// Set selected test
 		changeTest(0);
 
 		fpsLabel = new Label("FPS: 999", skin);

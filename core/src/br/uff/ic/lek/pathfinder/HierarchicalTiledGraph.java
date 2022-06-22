@@ -1,19 +1,12 @@
 package br.uff.ic.lek.pathfinder;
 
-import br.uff.ic.lek.pathfinder.DungeonUtils;
-import br.uff.ic.lek.pathfinder.FlatTiledNode;
-import br.uff.ic.lek.pathfinder.TiledGraph;
 import br.uff.ic.lek.pathfinder.DungeonUtils.TwoLevelHierarchy;
 import com.badlogic.gdx.ai.pfa.Connection;
 import com.badlogic.gdx.ai.pfa.indexed.IndexedHierarchicalGraph;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
-import com.badlogic.gdx.ai.pfa.Connection;
 
-/** A random generated graph representing a hierarchical tiled map.
- *
- * @author davebaol */
 public class HierarchicalTiledGraph extends IndexedHierarchicalGraph<HierarchicalTiledNode> implements
         TiledGraph<HierarchicalTiledNode> {
     private static final int LEVELS = 2;
@@ -34,10 +27,8 @@ public class HierarchicalTiledGraph extends IndexedHierarchicalGraph<Hierarchica
     }
 
     @Override
-    public void init (int map[][]) {
-        //LEK TODO inicializar e alterar a forma de inicializar  LEVELS, sizeX, sizeY, offset
-        // COMO ESTA AQUI NAO FUNCIONA, FALTA IMPLEMENTAR
-    }
+    public void init (int map[][]) { }
+		
     @Override
     public void init (int roomCount, int roomMinSize, int roomMaxSize, int squashIterations) {
         int tilesX = sizeX[0];

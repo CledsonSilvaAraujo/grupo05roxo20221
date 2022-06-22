@@ -28,7 +28,6 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.sun.tools.javac.util.ArrayUtils;
 
 import aurelienribon.tweenengine.BaseTween;
 import aurelienribon.tweenengine.Timeline;
@@ -37,7 +36,6 @@ import aurelienribon.tweenengine.TweenCallback;
 import aurelienribon.tweenengine.TweenManager;
 import aurelienribon.tweenengine.equations.Expo;
 
-import java.sql.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,7 +54,6 @@ public class World {
 	public static int avatarStartTileY;
 	public static int maxNumberOfAvatars = 4;
 
-	private static ClassHud hud;
 	private static float mapWidthPixel;
 	private static float mapHeightPixel;
 
@@ -75,7 +72,6 @@ public class World {
 	private OrthogonalTiledMapRenderer tiledMapRender;
 	private AssetManager assets;
 	private BitmapFont font;
-	private float count = 100.0f;
 
 	private World() {
 		ClassToast.initToastFactory();
@@ -134,11 +130,11 @@ public class World {
 		world.worldController = new WorldController(World.world);
 
 		world.batch = new SpriteBatch();
-		World.hud = new ClassHud(world.batch);
+		new ClassHud(world.batch);
 		world.controller = new CameraController();
 		world.gestureDetector = new GestureDetector(20, 0.5f, 2, 0.15f, world.controller);
 		world.inputMultiplexer = new InputMultiplexer();
-		world.inputMultiplexer.addProcessor(World.hud.stage);
+		world.inputMultiplexer.addProcessor(ClassHud.stage);
 		world.inputMultiplexer.addProcessor(world.worldController);
 		world.inputMultiplexer.addProcessor(world.gestureDetector);
 
@@ -224,14 +220,11 @@ public class World {
 			this.tiledMapRender.getBatch().end();
 		}
 
-		float x = World.world.getAvatar().getX() + World.world.getAvatar().getWidth();
-		float y = World.world.getAvatar().getY() + World.world.getAvatar().getHeight();
-
 		World.world.pathPlan.render(delta);
 
-		batch.setProjectionMatrix(World.world.hud.stage.getCamera().combined);
+		batch.setProjectionMatrix(ClassHud.stage.getCamera().combined);
 
-		World.world.hud.stage.draw();
+		ClassHud.stage.draw();
 
 		Matrix4 uiMatrix = World.camera.combined.cpy();
 		float screenHeight = Gdx.graphics.getHeight();

@@ -27,14 +27,9 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
 
-import org.graalvm.compiler.word.Word;
-
 import br.uff.ic.lek.utils.ClassToast;
 
 
-/**
- * Created by Prof. Lauro Eduardo Kozovits, TCC, UFF. Projeto Memória Periódica on 26/08/2016.
- */
 public class ClassCommandButton extends ClassActorAccessor {
 
     public static final int  BT_NONE = 0;
@@ -113,7 +108,6 @@ public class ClassCommandButton extends ClassActorAccessor {
         setOrigin(frente.getWidth()/2f, frente.getHeight()/2f);
         this.acao = acao;
         final int action = acao;
-        final ClassCommandButton myself = this;
         Gdx.app.log("botao", "adiciona listener"+action);
         addListener(new InputListener(){
 

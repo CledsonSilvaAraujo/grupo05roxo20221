@@ -1,14 +1,5 @@
 package br.uff.ic.lek.pathfinder;
 
-
-import br.uff.ic.lek.pathfinder.HierarchicalTiledGraph;
-import br.uff.ic.lek.pathfinder.HierarchicalTiledNode;
-import br.uff.ic.lek.pathfinder.PathFinderTestBase;
-import br.uff.ic.lek.pathfinder.PathFinderTests;
-import br.uff.ic.lek.pathfinder.TiledManhattanDistance;
-import br.uff.ic.lek.pathfinder.TiledNode;
-import br.uff.ic.lek.pathfinder.TiledRaycastCollisionDetector;
-import br.uff.ic.lek.pathfinder.TiledSmoothableGraphPath;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.ai.msg.MessageManager;
@@ -38,9 +29,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.Pool.Poolable;
 
-/** This test shows interruptible hierarchical pathfinding through a {@link PathFinderQueue}.
- * 
- * @author davebaol */
+
 public class InterruptibleHierarchicalTiledAStarTest extends PathFinderTestBase implements Telegraph {
 
 	final static float width = 8; // 5; // 10;

@@ -144,6 +144,7 @@ public class WorldController implements InputProcessor {
 		this.player.setTarget(target);
 		world.pathPlan.targetChanged(screenX, screenY);
 		fezTouchDown = false;
+		return false;
 	}
 
 	@Override

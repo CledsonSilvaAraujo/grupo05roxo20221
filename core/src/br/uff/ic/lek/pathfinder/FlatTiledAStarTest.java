@@ -1,13 +1,5 @@
 package br.uff.ic.lek.pathfinder;
 
-
-import br.uff.ic.lek.pathfinder.FlatTiledGraph;
-import br.uff.ic.lek.pathfinder.FlatTiledNode;
-import br.uff.ic.lek.pathfinder.PathFinderTestBase;
-import br.uff.ic.lek.pathfinder.PathFinderTests;
-import br.uff.ic.lek.pathfinder.TiledManhattanDistance;
-import br.uff.ic.lek.pathfinder.TiledRaycastCollisionDetector;
-import br.uff.ic.lek.pathfinder.TiledSmoothableGraphPath;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.ai.pfa.PathSmoother;
@@ -26,10 +18,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.TimeUtils;
 
-/** This test shows how the {@link IndexedAStarPathFinder} can be used on a tiled map with no diagonal movement. It also shows how
- * to use a {@link PathSmoother} on the found path to reduce the zigzag.
- * 
- * @author davebaol */
+
 public class FlatTiledAStarTest extends PathFinderTestBase {
 
 	final static float width = 8; // 5; // 10;

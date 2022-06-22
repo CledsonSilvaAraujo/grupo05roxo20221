@@ -1,7 +1,6 @@
 package br.uff.ic.lek.pathfinder;
 
 
-import br.uff.ic.lek.pathfinder.TiledNode;
 import com.badlogic.gdx.ai.pfa.Connection;
 import com.badlogic.gdx.utils.Array;
 

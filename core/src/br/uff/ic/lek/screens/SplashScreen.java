@@ -71,9 +71,9 @@ public class SplashScreen implements Screen {
                                         }
                                     }
                         )
-                ) // Actions.sequence
-        ); // splashImage.addAction
-    } // show()
+                )
+        );
+    }
 
     @Override
     public void render(float delta) {
@@ -85,34 +85,22 @@ public class SplashScreen implements Screen {
     }
 
     @Override
-    public void resize(int width, int height) {
-        // TODO Auto-generated method stub
-
-    }
+    public void resize(int width, int height) { }
 
     @Override
-    public void pause() {
-        // TODO Auto-generated method stub
-
-    }
+    public void pause() { }
 
     @Override
-    public void resume() {
-        // TODO Auto-generated method stub
-
-    }
+    public void resume() { }
 
     @Override
     public void hide() {
         this.dispose();
-
     }
 
     @Override
     public void dispose() {
         this.texture.dispose();
         this.stage.dispose();
-
     }
-
 }

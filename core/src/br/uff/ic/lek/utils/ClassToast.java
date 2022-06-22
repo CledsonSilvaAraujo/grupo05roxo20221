@@ -1,31 +1,15 @@
-/*
-    Fábrica de Software para Educação
-    Professor Lauro Kozovits, D.Sc.
-    ProfessorKozovits@gmail.com
-    Universidade Federal Fluminense, UFF
-    Rio de Janeiro, Brasil
-    Subprojeto: Alchemie Zwei
-
-    Partes do software registradas no INPI como integrantes de alguns apps para smartphones
-    Copyright @ 2016..2022
-
-    Se você deseja usar partes do presente software em seu projeto, por favor mantenha esse cabeçalho e peça autorização de uso.
-    If you wish to use parts of this software in your project, please keep this header and ask for authorization to use.
-
- */
 package br.uff.ic.lek.utils;
+
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.graphics.Color;
-//import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFontCache;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 
@@ -33,31 +17,13 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-/**
- * Android-like toast implementation for LibGDX projects
- *
- * @author Tomas Chalupnik (tchalupnik.cz)
- * https://github.com/wentsa/Toast-LibGDX
- *
- * fixed and modified by LEK - Lauro Eduardo Kozovits
- */
-public class ClassToast { //LEK extends Actor {
+
+public class ClassToast {
     public static final float SHORT = 2.0f;
     public static final float LONG = 3.5f;
-    public enum Length2 {
-        SHORT2(2f),
-        LONG2(3.5f);
-        private final float duration; // in seconds
-        Length2(float duration) {
-            this.duration = duration;
-        }
-    }
 
-
-    //* LEKREMOVER
     private static List<ClassToast> toasts = new LinkedList<ClassToast>();
     private static ClassToast.ClassToastFactory toastFactory;
-    //private ClassDisplayText cdt;
 
     public static void initToastFactory(){
 
@@ -66,18 +32,15 @@ public class ClassToast { //LEK extends Actor {
         }
 
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("ToastFont.ttf"));
-        //FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("LiberationSans-Regular.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-        float correcao = Gdx.graphics.getDensity(); // Gdx.graphics.getDensity(); //Gdx.graphics.getWidth()/1920.0f; //Gdx.graphics.getDensity()*
+        float correcao = Gdx.graphics.getDensity();
         parameter.characters = " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789:;,/*!?-+()[]_^.áàéíóúâêôçÇ@#&%=";
-        //e.g. abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.!'()>?:
-        // These characters should not repeat!
-        correcao = 1.0f; // cancelo, pois Gdx.graphics.getDensity() não está funcionando
-        parameter.size = (int) (50f * correcao); //TODO o font está ficando com tamanhos diferentes em cada celular
+        correcao = 1.0f;
+        parameter.size = (int) (50f * correcao);
         BitmapFont font = generator.generateFont(parameter);
         generator.dispose();
         toastFactory = new ClassToast.ClassToastFactory.Builder()
-                .font(font)  //.font(font) pode usar o font default ou passar um font
+                .font(font)
                 .margin(20)
                 .maxTextRelativeWidth(0.7f)
                 .build();
@@ -256,19 +219,10 @@ public class ClassToast { //LEK extends Actor {
 
         private ClassToastFactory() {
             float screenHeight = Gdx.graphics.getHeight();
-            float screenWidth = Gdx.graphics.getWidth();
             float bottomGap = 100;
-            float leftGap = 100;
             positionY = bottomGap + ((screenHeight - bottomGap) / 10);
-            //positionX = leftGap + ((screenWidth - leftGap) / 10);
         }
 
-        /**
-         * Creates new toast
-         * @param text message
-         * @param length toast duration
-         * @return newly created toast
-         */
         public ClassToast create(String text, float length) {
             return new ClassToast(
                     text,
