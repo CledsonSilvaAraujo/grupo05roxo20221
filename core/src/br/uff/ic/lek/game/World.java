@@ -2,7 +2,11 @@ package br.uff.ic.lek.game;
 
 import br.uff.ic.lek.PlayerData;
 import br.uff.ic.lek.actors.Avatar;
-import br.uff.ic.lek.actors.AvatarNPC;
+import br.uff.ic.lek.actors.Player;
+import br.uff.ic.lek.actors.PlayerLocal;
+import br.uff.ic.lek.actors.PlayerOnline;
+import br.uff.ic.lek.actors.NPC;
+import br.uff.ic.lek.actors.Enemy;
 import br.uff.ic.lek.utils.CameraZoomAdjust;
 import br.uff.ic.lek.utils.ClassToast;
 import br.uff.ic.lek.utils.PathPlanning;
@@ -28,6 +32,7 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 
 import aurelienribon.tweenengine.BaseTween;
 import aurelienribon.tweenengine.Timeline;
@@ -52,7 +57,7 @@ public class World {
 	public static int tileHeight;
 	public static int avatarStartTileX;
 	public static int avatarStartTileY;
-	public static int maxNumberOfAvatars = 4;
+	public static final int MAX_PLAYERS = 4;
 
 	private static float mapWidthPixel;
 	private static float mapHeightPixel;
@@ -64,8 +69,12 @@ public class World {
 	public Music backgroundMusic;
 	public PathPlanning pathPlan;
 
+	private PlayerLocal mainPlayer;
 	private List<Avatar> avatars = new ArrayList<Avatar>();
-	private Avatar player;
+	private List<Player> players = new ArrayList<Player>();
+	private List<NPC> npcs = new ArrayList<NPC>();
+	private List<Enemy> enemies = new ArrayList<Enemy>();
+	
 	private CameraController controller;
 	private GestureDetector gestureDetector;
 	private CameraZoomAdjust cameraZoomAdjust;
@@ -109,17 +118,17 @@ public class World {
 		World.atlasPlayerS_W_E_N = this.assets.get("img/guerreiraS_W_E_N_210x280.pack");
 		World.atlasPlayerSW_NW_SE_NE = this.assets.get("img/guerreiraSW_NW_SE_NE_210x280.pack");
 
-		this.createPlayer();
-		this.createNPC();
+		this.createMainPlayer();
+		this.createEnemy();
 		
-		World.camera = new OrthographicCamera(this.player.getX(), this.player.getY());
+		World.camera = new OrthographicCamera(this.mainPlayer.getX(), this.mainPlayer.getY());
 		World.camera.zoom = 0.5f;
 
 		pathPlan = new PathPlanning(this);
 		pathPlan.create();
 
-		this.player.setX(avatarStartTileX*World.tileWidth);
-		this.player.setY(avatarStartTileY*World.tileHeight);
+		this.mainPlayer.setX(avatarStartTileX*World.tileWidth);
+		this.mainPlayer.setY(avatarStartTileY*World.tileHeight);
 	}
 
 	public static void load() {
@@ -141,7 +150,7 @@ public class World {
 		world.tiledMapRender = new OrthogonalTiledMapRenderer(world.map);
 		World.camera = world.getCamera();
 		World.camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-		World.camera.position.set(world.getAvatar().getX() - world.getAvatar().getWidth() / 2, world.getAvatar().getY() - world.getAvatar().getHeight() / 2, 0);
+		World.camera.position.set(world.getMainPlayer().getX() - world.getMainPlayer().getWidth() / 2, world.getMainPlayer().getY() - world.getMainPlayer().getHeight() / 2, 0);
 		World.camera.update();
 		world.font = new BitmapFont();
 		world.font.setColor(Color.RED);
@@ -236,10 +245,6 @@ public class World {
 		ClassToast.showToasts(batch);
 	}
 
-	public Avatar getAvatar() {
-			return this.avatars.get(0);
-	}
-
 	public OrthographicCamera getCamera() {
 			return World.camera;
 	}
@@ -248,43 +253,86 @@ public class World {
 			World.bounds = bounds;
 	}
 
+	public PlayerLocal getMainPlayer() {
+		return this.mainPlayer;
+	}
+
 	public List<Avatar> getAvatars() {
-		for(Avatar avatar:this.avatars){
-			System.out.println(avatar.getAuthUID());
-		}
 		return this.avatars;
 	}
 
-	private int getAvatarsTotal() {
-		return this.avatars.size();
+	public List<Player> getPlayers() {
+		return this.players;
 	}
 
-	private void addAvatar(Avatar avatar) {
-		if (this.getAvatarsTotal() == World.maxNumberOfAvatars) {
-			System.out.println("Limit of Avatars reached");
-			return;
-		}
-		this.avatars.add(avatar);
+	public List<NPC> getNPCs() {
+		return this.npcs;
+	}
+
+	public List<Enemy> getEnemies() {
+		return this.enemies;
+	}
+
+	public void setMainPlayerTarget(Vector3 target) {
+		this.mainPlayer.setTarget(target);
+	}
+
+	private int getPlayersAmount() {
+		return this.players.size();
+	}
+
+	private void createMainPlayer() {
+		PlayerLocal mainPlayer = new PlayerLocal(
+			new Sprite(World.atlasPlayerS_W_E_N.findRegion("South02")),
+			avatarStartTileX*World.tileWidth,
+			avatarStartTileY*World.tileHeight,
+			PlayerData.myPlayerData().getAuthUID()
+		);
+
+		this.avatars.add(mainPlayer);
+		this.players.add(mainPlayer);
+		this.mainPlayer = mainPlayer;
 	}
 
 	private void createPlayer() {
-		Avatar player = new Avatar(
+		if (this.getPlayersAmount() >= World.MAX_PLAYERS) {
+			System.out.println("Limit of Avatars reached");
+			return;
+		}
+
+		PlayerOnline player = new PlayerOnline(
 			new Sprite(World.atlasPlayerS_W_E_N.findRegion("South02")),
-			(avatarStartTileX)*World.tileWidth, avatarStartTileY*World.tileHeight,
+			avatarStartTileX*World.tileWidth,
+			avatarStartTileY*World.tileHeight,
 			PlayerData.myPlayerData().getAuthUID()
 		);
-		this.player = player;
-		this.addAvatar(player);
+
+		this.avatars.add(player);
+		this.players.add(player);
 	}
 
 	private void createNPC() {
-		AvatarNPC npc = new AvatarNPC(
+		NPC npc = new NPC(
 			new Sprite(World.atlasPlayerS_W_E_N.findRegion("South02")),
-			(avatarStartTileX)*World.tileWidth,
+			avatarStartTileX*World.tileWidth,
 			avatarStartTileY*World.tileHeight,
-			"A"
+			"NPC"
 		);
-		this.addAvatar(npc);
+
+		this.avatars.add(npc);
+		this.npcs.add(npc);
+	}
+
+	private void createEnemy() {
+		Enemy enemy = new Enemy(
+			new Sprite(World.atlasPlayerS_W_E_N.findRegion("South02")),
+			avatarStartTileX*World.tileWidth,
+			avatarStartTileY*World.tileHeight,
+			"ENEMY"
+		);
+
+		this.avatars.add(enemy);
+		this.enemies.add(enemy);
 	}
 }
 

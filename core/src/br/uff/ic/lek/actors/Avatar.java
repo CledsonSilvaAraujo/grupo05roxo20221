@@ -39,7 +39,6 @@ public class Avatar extends Sprite {
 
 	private float elapsedTime;
 	private float tempoAcumulado;
-	private double playerMovementAngle;
 
 	private TextureRegion currentFrame;
 	private Animation<TextureRegion> walkingWest;
@@ -182,8 +181,12 @@ public class Avatar extends Sprite {
 		return orientation;
 	}
 
-	public Vector3 getVelocity() {
-		return speed;
+	public Vector3 getSpeed() {
+		return this.speed;
+	}
+
+	public Vector3 getPosition() {
+		return this.position;
 	}
 
 	public PlayerData getFirebaseData() {
@@ -218,6 +221,12 @@ public class Avatar extends Sprite {
 		this.authUID = authUID;
 	}
 
+	public void setPosition(float x,float y) {
+		this.position.x = x;
+		this.position.y = y;
+		super.setPosition(x, y);
+	}
+
 	public void setTarget(float x,float y) {
 		this.target.x = x;
 		this.target.y = y;
@@ -231,7 +240,7 @@ public class Avatar extends Sprite {
 		this.orientation = orientation;
 	}
 
-	public void defineOrientation(double anguloGraus) {
+	public void setOrientation(double anguloGraus) {
 		if (anguloGraus > 22.5 &&  anguloGraus <= 67.5)
 			this.orientation = Compass.NORTH_EAST;
 		else if (anguloGraus > 67.5 &&  anguloGraus <= 112.5)
@@ -256,23 +265,20 @@ public class Avatar extends Sprite {
 			return;
 		}
 
-		double distancia = Math.sqrt((position.x - this.target.x)*(position.x - this.target.x) + (position.y - this.target.y)*(position.y - this.target.y));
-		float x = (float) ((this.target.x -position.x)/distancia);
-		float y = (float) ((this.target.y -position.y)/distancia);
-		double angulo1 = Math.acos((double) x)*180.0/Math.PI;
-		double angulo2 = Math.asin((double) y)*180.0/Math.PI;
+		float distance = this.getTargetDistance();
 
-		if(angulo2 >= 0.0)
-			playerMovementAngle = angulo1;
-		else
-			playerMovementAngle = 360.0 - angulo1;
+		float x = ((this.target.x - this.position.x)/distance);
+		float y = ((this.target.y - this.position.y)/distance);
+		double angulo1 = Math.acos(x)*180.0/Math.PI;
+		double angulo2 = Math.asin(y)*180.0/Math.PI;
 
-		defineOrientation(playerMovementAngle);
-		double posx = (this.target.x -position.x)/distancia * Avatar.MAX_SPEED*delta + position.x;
-		double posy = (this.target.y -position.y)/distancia * Avatar.MAX_SPEED*delta + position.y;
-		position.x = (float) posx;
-		position.y = (float) posy;
-		this.setPosition(position.x, position.y);
+		double currentAngle =	angulo2 >= 0.0 ? angulo1 : (360.0 - angulo1);
+
+		this.setOrientation(currentAngle);
+		this.setPosition(
+			(this.target.x - this.position.x)/distance * Avatar.MAX_SPEED*delta + this.position.x,
+			(this.target.y - this.position.y)/distance * Avatar.MAX_SPEED*delta + this.position.y
+		);
 		this.setState(State.WALKING);
 	}
 
@@ -300,31 +306,35 @@ public class Avatar extends Sprite {
 			Gdx.input.vibrate(50);
 			this.setX(1);
 			position.x = this.getX();
-			this.getVelocity().x = 0;
+			this.getSpeed().x = 0;
 			this.setState(State.IDLE);
 		} else if(this.getX() > (World.getMapWidthPixel() - this.getWidth())) {
 			Gdx.input.vibrate(50);
 			this.setX(World.getMapWidthPixel() - this.getWidth() - 1);
 			position.x = this.getX();
-			this.getVelocity().x = 0;
+			this.getSpeed().x = 0;
 			this.setState(State.IDLE);
 		}
 		if(this.getY() < 0) {
 			Gdx.input.vibrate(50);
 			this.setY(1);
 			position.y = this.getY();
-			this.getVelocity().y = 0;
+			this.getSpeed().y = 0;
 			this.setState(State.IDLE);
 		} else if(this.getY() > (World.getMapHeightPixel() - this.getHeight())) {
 			Gdx.input.vibrate(50);
 			this.setY(World.getMapHeightPixel() - this.getHeight() -1);
 			position.y = this.getY();
-			this.getVelocity().y = 0;
+			this.getSpeed().y = 0;
 			this.setState(State.IDLE);
 		}
 	}
 
-	private boolean isInTarget() {
-		return this.position.dst(this.target.x, this.target.y, 0) < 32/2;
+	protected float getTargetDistance() {
+		return this.position.dst(this.target.x, this.target.y, 0);
+	}
+
+	protected boolean isInTarget() {
+		return this.getTargetDistance() < 16;
 	}
 }

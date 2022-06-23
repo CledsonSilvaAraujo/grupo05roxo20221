@@ -1,6 +1,10 @@
 package br.uff.ic.lek.game;
 
 import br.uff.ic.lek.actors.Avatar;
+import br.uff.ic.lek.actors.Player;
+import br.uff.ic.lek.actors.PlayerLocal;
+import br.uff.ic.lek.actors.NPC;
+import br.uff.ic.lek.actors.Enemy;
 import br.uff.ic.lek.actors.Avatar.State;
 
 import com.badlogic.gdx.Gdx;
@@ -16,8 +20,12 @@ import java.util.List;
 
 public class WorldController implements InputProcessor {
 	private World world;
-	private Avatar player;
+	private PlayerLocal mainPlayer;
 	private List<Avatar> avatars = new ArrayList<Avatar>();
+	private List<Player> players = new ArrayList<Player>();
+	private List<NPC> npcs = new ArrayList<NPC>();
+	private List<Enemy> enemies = new ArrayList<Enemy>();
+
 	private OrthographicCamera camera;
 
 	private float minCameraX;
@@ -31,12 +39,16 @@ public class WorldController implements InputProcessor {
 
 	public WorldController(World world) {
 		this.world = world;
-		this.camera = this.world.getCamera();
-		this.avatars = this.world.getAvatars();
-		this.player = this.avatars.get(0);
+		this.camera = world.getCamera();
+		this.mainPlayer = world.getMainPlayer();
+		this.avatars = world.getAvatars();
+		this.players = world.getPlayers();
+		this.npcs = world.getNPCs();
+		this.enemies = world.getEnemies();
 	}
 
 	public void update(float delta) {
+		this.setEnemiesTargets();
 		this.updateAvatars(delta);
 		this.minCameraX = this.camera.zoom * (this.camera.viewportWidth / 2);
 		this.maxCameraX = World.getMapWidthPixel() - minCameraX;
@@ -44,17 +56,17 @@ public class WorldController implements InputProcessor {
 		this.maxCameraY = World.getMapHeightPixel() - minCameraY;
 		this.camera.position.set(
 			Math.min(maxCameraX, Math.max(this.avatars.get(0).getX(), minCameraX)),
-			Math.min(maxCameraY, Math.max(this.player.getY(), minCameraY)),
+			Math.min(maxCameraY, Math.max(this.mainPlayer.getY(), minCameraY)),
 			0
 		);
 		this.camera.update();
 	}
 
 	public void onNotification(Dictionary<String,String> cmdData) {
-		for (Avatar avatar : this.avatars) {
-			if (avatar.getAuthUID() == cmdData.get("uID")) {
+		for (Player player : this.players) {
+			if (player.getAuthUID() == cmdData.get("uID")) {
 				if (cmdData.get("cmd") == "MOVE") {
-					avatar.setTarget(
+					player.setTarget(
 						Float.parseFloat(cmdData.get("px")),
 						Float.parseFloat(cmdData.get("py"))
 					);
@@ -68,24 +80,24 @@ public class WorldController implements InputProcessor {
 	@Override
 	public boolean keyDown(int keycode) {
 		if((keycode == Input.Keys.W)) {
-			this.player.setOrientation(Avatar.Compass.NORTH);
-			this.player.setState(State.WALKING);
-			this.player.getVelocity().y = Avatar.MAX_SPEED;
+			this.mainPlayer.setOrientation(Avatar.Compass.NORTH);
+			this.mainPlayer.setState(State.WALKING);
+			this.mainPlayer.getSpeed().y = Avatar.MAX_SPEED;
 		}
 		if((keycode == Input.Keys.S)) {
-			this.player.setOrientation(Avatar.Compass.SOUTH);
-			this.player.setState(State.WALKING);
-			this.player.getVelocity().y = -Avatar.MAX_SPEED;
+			this.mainPlayer.setOrientation(Avatar.Compass.SOUTH);
+			this.mainPlayer.setState(State.WALKING);
+			this.mainPlayer.getSpeed().y = -Avatar.MAX_SPEED;
 		}
 		if((keycode == Input.Keys.A)) {
-			this.player.setOrientation(Avatar.Compass.WEST);
-			this.player.setState(State.WALKING);
-			this.player.getVelocity().x = -Avatar.MAX_SPEED;
+			this.mainPlayer.setOrientation(Avatar.Compass.WEST);
+			this.mainPlayer.setState(State.WALKING);
+			this.mainPlayer.getSpeed().x = -Avatar.MAX_SPEED;
 		}
 		if((keycode == Input.Keys.D)) {
-			this.player.setOrientation(Avatar.Compass.EAST);
-			this.player.setState(State.WALKING);
-			this.player.getVelocity().x = Avatar.MAX_SPEED;
+			this.mainPlayer.setOrientation(Avatar.Compass.EAST);
+			this.mainPlayer.setState(State.WALKING);
+			this.mainPlayer.getSpeed().x = Avatar.MAX_SPEED;
 		}
 		return true;
 	}
@@ -93,10 +105,10 @@ public class WorldController implements InputProcessor {
 	@Override
 	public boolean keyUp(int keycode) {
 		if((keycode == Input.Keys.W) || (keycode == Input.Keys.S)) {
-			this.player.getVelocity().y = 0;
+			this.mainPlayer.getSpeed().y = 0;
 		}
 		if((keycode == Input.Keys.A) || (keycode == Input.Keys.D)) {
-			this.player.getVelocity().x = 0;
+			this.mainPlayer.getSpeed().x = 0;
 		}
 		return true;
 	}
@@ -120,29 +132,13 @@ public class WorldController implements InputProcessor {
 
 		if (!requestMove) return true;
 
-		float x = this.player.getX();
-		float y = this.player.getY();
-
-		this.world.getAvatar().setState(State.WALKING);
+		System.out.println("move request!");
 
 		Vector3 target = new Vector3(screenX, screenY, 0);
 
 		this.camera.unproject(target);
-
-		if (Math.abs(target.x - x) > Math.abs(target.y - y)) {
-			if ((target.x - x) > 0)
-				this.player.setOrientation(Avatar.Compass.EAST);
-			else
-				this.player.setOrientation(Avatar.Compass.WEST);
-		} else {
-			if ((target.y - y) > 0)
-				this.player.setOrientation(Avatar.Compass.NORTH);
-			else
-				this.player.setOrientation(Avatar.Compass.SOUTH);
-		}
-
-		this.player.setTarget(target);
-		world.pathPlan.targetChanged(screenX, screenY);
+		this.world.setMainPlayerTarget(target);
+		this.world.pathPlan.targetChanged(screenX, screenY);
 		fezTouchDown = false;
 		return false;
 	}
@@ -174,8 +170,12 @@ public class WorldController implements InputProcessor {
 
 	private void updateAvatars(float delta) {
 		for(Avatar avatar : this.avatars) {
-				avatar.update(delta);
+			avatar.update(delta);
 		}
+	}
+
+	private void setEnemiesTargets() {
+		for (Enemy enemy : this.enemies) enemy.setTarget(this.players);
 	}
 
 	private int manhattanDistance(int screenX, int screenY){

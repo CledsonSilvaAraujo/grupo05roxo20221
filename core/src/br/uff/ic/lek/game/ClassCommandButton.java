@@ -127,8 +127,8 @@ public class ClassCommandButton extends ClassActorAccessor {
                         World.disparaAnimacaoCamera(2.5f, 7.0f);
 
                     } else if(action == ClassCommandButton.BT_HELP) {
-                        System.out.println("Avatar " + World.world.getAvatar().getX());
-                        ClassThreadComandos.objetoAndroidFireBase.writePlayerData(World.world.getAvatar());
+                        System.out.println("Avatar " + World.world.getMainPlayer().getX());
+                        ClassThreadComandos.objetoAndroidFireBase.writePlayerData(World.world.getMainPlayer());
                         Color backgroundColor = new Color(0f, 0f, 0f, 0.5f);
                         Color fontColor = new Color(1, 1, 0, 0.5f);
                         String msg = "Apenas grava dados do jogador. Verifique como outros smartphones tambem executando sao afetados";
