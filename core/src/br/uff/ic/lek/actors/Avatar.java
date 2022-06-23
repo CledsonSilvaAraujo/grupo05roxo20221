@@ -61,11 +61,9 @@ public class Avatar extends Sprite {
 	public Avatar(Sprite sprite, float x, float y, String authUID) {
 		super(sprite);
 		this.setPosition(x, y);
+		this.setTarget(this.getPosition());
 		this.authUID = authUID;
 		this.avatarPower = new AvatarPower(100.0f);
-		position.x = x;
-		position.y = y;
-		position.z = (float) 0.0;
 		this.state = State.IDLE;
 		this.orientation = Compass.SOUTH;
 
@@ -333,6 +331,11 @@ public class Avatar extends Sprite {
 	protected float getTargetDistance() {
 		return this.position.dst(this.target.x, this.target.y, 0);
 	}
+
+	protected Vector3 getTarget(){
+		return this.target;
+	}
+
 
 	protected boolean isInTarget() {
 		return this.getTargetDistance() < 16;

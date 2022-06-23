@@ -14,7 +14,7 @@ public class Enemy extends Avatar {
 		this.setTarget(players.get(0).getPosition());
 	}
 
-	protected boolean isInTarget(float delta) {
-		return this.getTargetDistance() < 48;
-	}
+	@Override
+	protected boolean isInTarget() { return this.getTargetDistance() < 100; }
+
 }

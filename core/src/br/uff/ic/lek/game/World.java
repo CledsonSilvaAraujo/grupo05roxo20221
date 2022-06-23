@@ -118,8 +118,12 @@ public class World {
 		World.atlasPlayerS_W_E_N = this.assets.get("img/guerreiraS_W_E_N_210x280.pack");
 		World.atlasPlayerSW_NW_SE_NE = this.assets.get("img/guerreiraSW_NW_SE_NE_210x280.pack");
 
-		this.createMainPlayer();
-		this.createEnemy();
+		this.createMainPlayer(new Vector2(3968,256));
+		this.createEnemy(new Vector2(200,20));
+		this.createEnemy(new Vector2(180,50));
+		this.createEnemy(new Vector2(140,100));
+		this.createEnemy(new Vector2(120,130));
+		this.createEnemy(new Vector2(100,180));
 		
 		World.camera = new OrthographicCamera(this.mainPlayer.getX(), this.mainPlayer.getY());
 		World.camera.zoom = 0.5f;
@@ -281,11 +285,11 @@ public class World {
 		return this.players.size();
 	}
 
-	private void createMainPlayer() {
+	private void createMainPlayer(Vector2 postion) {
 		PlayerLocal mainPlayer = new PlayerLocal(
 			new Sprite(World.atlasPlayerS_W_E_N.findRegion("South02")),
-			avatarStartTileX*World.tileWidth,
-			avatarStartTileY*World.tileHeight,
+			postion.x,
+			postion.y,
 			PlayerData.myPlayerData().getAuthUID()
 		);
 
@@ -323,11 +327,11 @@ public class World {
 		this.npcs.add(npc);
 	}
 
-	private void createEnemy() {
+	private void createEnemy(Vector2 position) {
 		Enemy enemy = new Enemy(
 			new Sprite(World.atlasPlayerS_W_E_N.findRegion("South02")),
-			avatarStartTileX*World.tileWidth,
-			avatarStartTileY*World.tileHeight,
+				position.x,
+				position.y,
 			"ENEMY"
 		);
 
