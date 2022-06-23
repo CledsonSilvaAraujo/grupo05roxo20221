@@ -6,6 +6,8 @@ import java.util.List;
 
 
 public class Enemy extends Avatar {
+	public static final float MAX_DISTANCE_FROM_TARGET = 100.0f;
+
 	public Enemy(Sprite sprite, float x, float y, String authUID) {
 		super(sprite, x, y, authUID);
 	}
@@ -15,6 +17,7 @@ public class Enemy extends Avatar {
 	}
 
 	@Override
-	protected boolean isInTarget() { return this.getTargetDistance() < 100; }
-
+	protected boolean isInTarget() {
+		return this.getTargetDistance() < MAX_DISTANCE_FROM_TARGET;
+	}
 }
