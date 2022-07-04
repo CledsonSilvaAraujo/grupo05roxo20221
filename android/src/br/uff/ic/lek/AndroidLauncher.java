@@ -7,6 +7,14 @@ import android.util.Log;
 
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
+import com.onesignal.OSDeviceState;
+import com.onesignal.OneSignal;
+//import com.onesignal.client.ApiClient;
+//import com.onesignal.client.ApiException;
+//import com.onesignal.client.Configuration;
+//import com.onesignal.client.auth.*;
+//import com.onesignal.client.model.*;
+//import com.onesignal.client.api.DefaultApi;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -22,12 +30,14 @@ import br.uff.ic.lek.Alquimia;
 
 public class AndroidLauncher extends AndroidApplication {
 	private static final String TAG = "JOGO";
+	private static final String ONESIGNAL_APP_ID = "92576ca0-c121-46bb-a1bc-24ca96e1173d";
+	private static final String ONESIGNAL_API_KEY = "ODlmNWZhMjUtZmJlYS00MTA5LTg5YTAtYWJkZjA5YTJiNmM1";
+	private static final String ONESIGNAL_USER_KEY_TOKEN = "MjAyYmY1ZDItOGY0Yi00MmQyLWE3YmUtZWFiNmZhNjcyZjc5";
 	protected String playerNickName;
 	protected String emailCRC32;
 	protected String pwdCRC32;
 	protected int runningTimes;
 	protected String sharedPreferencesName = "ALCH0005";
-
 
 	protected void defaultAccountGenerator() {
 		Date date = Calendar.getInstance().getTime();
@@ -75,7 +85,7 @@ public class AndroidLauncher extends AndroidApplication {
 			playerNickName=savedPlayerNickName;
 			pwdCRC32= savedPwdCRC32;
 			emailCRC32=savedEmailCRC32;
-			
+
 			SharedPreferences sharedPreferences = getSharedPreferences(sharedPreferencesName, Context.MODE_PRIVATE);
 			SharedPreferences.Editor myEdit = sharedPreferences.edit();
 

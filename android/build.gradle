@@ -25,6 +25,7 @@ android {
         versionCode 1
         versionName "1.0"
         multiDexEnabled true
+        manifestPlaceholders = [onesignal_app_id: "92576ca0-c121-46bb-a1bc-24ca96e1173d",onesignal_google_project_number: "REMOTE"]
     }
     buildTypes {
         release {
@@ -37,9 +38,6 @@ android {
 }
 
 
-// called every time gradle gets executed, takes the native dependencies of
-// the natives configuration, and extracts them to the proper libs/ folders
-// so they get packed with the APK.
 task copyAndroidNatives {
     doFirst {
         file("libs/armeabi/").mkdirs()
@@ -102,6 +100,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics:20.1.2'
     implementation 'com.google.firebase:firebase-auth:21.0.3'
     implementation 'androidx.multidex:multidex:2.0.1'
+    implementation 'com.onesignal:OneSignal:[4.0.0, 4.99.99]'
 }
 
 eclipse.project.name = appName + "-android"

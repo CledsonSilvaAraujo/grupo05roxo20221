@@ -10,6 +10,7 @@ buildscript {
 	dependencies {
 		classpath 'com.android.tools.build:gradle:7.1.2'
 		classpath 'com.google.gms:google-services:4.3.10'
+		classpath 'gradle.plugin.com.onesignal:onesignal-gradle-plugin:[0.12.10, 0.99.99]'
 	}
 }
 
@@ -40,6 +41,7 @@ allprojects {
 project(":android") {
 	apply plugin: "com.android.application"
 	apply plugin: 'com.google.gms.google-services'
+	apply plugin: "com.onesignal.androidsdk.onesignal-gradle-plugin"
 
 	configurations { natives }
 
@@ -65,6 +67,7 @@ project(":android") {
 		api "com.badlogicgames.gdx-controllers:gdx-controllers-android:$gdxControllersVersion"
 		implementation platform('com.google.firebase:firebase-bom:29.2.1')
 		implementation 'com.google.firebase:firebase-analytics'
+		implementation 'com.onesignal:OneSignal:[4.0.0, 4.99.99]'
 	}
 }
 
