@@ -41,7 +41,6 @@ allprojects {
 project(":android") {
 	apply plugin: "com.android.application"
 	apply plugin: 'com.google.gms.google-services'
-	apply plugin: "com.onesignal.androidsdk.onesignal-gradle-plugin"
 
 	configurations { natives }
 
