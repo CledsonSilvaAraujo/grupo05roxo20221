@@ -7,7 +7,6 @@ import android.util.Log;
 
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
-import com.google.android.gms.common.api.ApiException;
 import com.onesignal.OSDeviceState;
 import com.onesignal.OneSignal;
 import com.onesignal.client.ApiClient;
@@ -31,6 +30,8 @@ import br.uff.ic.lek.Alquimia;
 public class AndroidLauncher extends AndroidApplication {
 	private static final String TAG = "JOGO";
 	private static final String ONESIGNAL_APP_ID = "92576ca0-c121-46bb-a1bc-24ca96e1173d";
+	private static final String ONESIGNAL_API_KEY = "ODlmNWZhMjUtZmJlYS00MTA5LTg5YTAtYWJkZjA5YTJiNmM1";
+	private static final String ONESIGNAL_USER_KEY_TOKEN = "MjAyYmY1ZDItOGY0Yi00MmQyLWE3YmUtZWFiNmZhNjcyZjc5";
 	protected String playerNickName;
 	protected String emailCRC32;
 	protected String pwdCRC32;
@@ -125,6 +126,12 @@ public class AndroidLauncher extends AndroidApplication {
 		PlayerData player = PlayerData.myPlayerData();
 		OneSignal.setExternalUserId(player.getAuthUID());
 
+//		try {
+//			invitePlayers();
+//		} catch (ApiException e) {
+//			e.printStackTrace();
+//		}
+
 	}
 
 	private void invitePlayers () throws ApiException {
@@ -176,9 +183,8 @@ public class AndroidLauncher extends AndroidApplication {
 		// Send Notification
 		{
 			try {
-				InlineResponse200 result = apiInstance.createNotification(notification);
+				apiInstance.createNotification(notification);
 				System.out.println("OneSignal Invite Sent Successfully!");
-				System.out.println(result);
 			} catch (ApiException e) {
 				System.err.println("Exception when calling DefaultApi#createNotification");
 				System.err.println("Status code: " + e.getCode());
