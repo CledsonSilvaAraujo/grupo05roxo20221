@@ -49,8 +49,6 @@ public class ClassCommandButton extends ClassActorAccessor {
     protected SpriteDrawable spriteDrawableFundo;
     protected ClassCommandButton previousButton;
 
-
-
     @Override
     public void draw(Batch batch, float parentAlpha) {
         batch.setColor(this.getColor());
@@ -60,7 +58,6 @@ public class ClassCommandButton extends ClassActorAccessor {
         float height = getHeight();
         float width = getWidth();
 
-        //*
         if (ClassCommandButton.acaoAtual == acao){
             batch.end();
             shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
@@ -72,17 +69,11 @@ public class ClassCommandButton extends ClassActorAccessor {
             shapeRenderer.end();
             batch.begin();
         }
-        //*/
 
-        //*
-        if(frontface) {
+        if(frontface)
             spriteDrawableFrente.draw(batch, x, y, width, height);
-        }else {
+        else
             spriteDrawableFundo.draw(batch, x, y, width, height);
-        }
-        //*/
-
-
     }
 
     // ClassCommandButton são usados no HUD
@@ -126,14 +117,16 @@ public class ClassCommandButton extends ClassActorAccessor {
                     if(action == ClassCommandButton.BT_INTERNET_SEARCH) {
                         World.disparaAnimacaoCamera(2.5f, 7.0f);
 
-                    } else if(action == ClassCommandButton.BT_HELP) {
+                    }
+                    else if(action == ClassCommandButton.BT_HELP) {
                         System.out.println("Avatar " + World.world.getMainPlayer().getX());
                         ClassThreadComandos.objetoAndroidFireBase.writePlayerData(World.world.getMainPlayer());
                         Color backgroundColor = new Color(0f, 0f, 0f, 0.5f);
                         Color fontColor = new Color(1, 1, 0, 0.5f);
-                        String msg = "Apenas grava dados do jogador. Verifique como outros smartphones tambem executando sao afetados";
+                        String msg = "save device data";
                         ClassToast.toastRich(msg, backgroundColor, fontColor, 5f);
-                    } else if(action == ClassCommandButton.BT_PLAY) {
+                    }
+                    else if(action == ClassCommandButton.BT_PLAY) {
                         ClassHud.btRESIZE.frontface = true;
                         ClassHud.btINFO.frontface = true;
                         ClassHud.btINTERNET.frontface = true;
@@ -144,16 +137,27 @@ public class ClassCommandButton extends ClassActorAccessor {
                             ClassThreadComandos.objetoAndroidFireBase.waitForMyMessages();
                             Color backgroundColor = new Color(0f, 0f, 0f, 0.5f);
                             Color fontColor = new Color(1, 1, 0, 0.5f);
-                            String msg = "Por enquanto, o app se prepara para receber mensagens do Firebase";
+                            String msg = "ready to listen firebase";
                             ClassToast.toastRich(msg, backgroundColor, fontColor, 5f);
                         }
-                    } else if(action == ClassCommandButton.BT_EXIT) {
+                    }
+                    else if(action == ClassCommandButton.BT_SOUND) {
+                        System.out.println("SOUND");
+                        ClassThreadComandos.objetoAndroidFireBase.waitForPlayers();
+                        Color backgroundColor = new Color(0f, 0f, 0f, 0.5f);
+                        Color fontColor = new Color(1, 1, 0, 0.5f);
+                        ClassToast.toastRich(
+                            "getting players",
+                            backgroundColor,
+                            fontColor,
+                            5f
+                        );
+                    }
+                    else if(action == ClassCommandButton.BT_EXIT) {
                         ClassThreadComandos.objetoAndroidFireBase.finishAndRemoveTask();
                     }
                 }
-
             }
-
         });
     }
     static boolean flag=false;

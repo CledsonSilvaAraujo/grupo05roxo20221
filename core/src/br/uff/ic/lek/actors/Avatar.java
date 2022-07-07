@@ -188,11 +188,9 @@ public class Avatar extends Sprite {
 	}
 
 	public PlayerData getFirebaseData() {
-		PlayerData pd = PlayerData.myPlayerData();
-		pd.setAuthUID(this.authUID);
-		pd.setWriterUID(this.authUID);
-		pd.setGameState(PlayerData.States.READYTOPLAY);
-		pd.setChat("empty");
+		PlayerData pd = new PlayerData();
+		pd.nickName = "xXSHADOWXx";
+		pd.gameState = PlayerData.States.READYTOPLAY;
 
 		class CmdObject {
 			private String command;
@@ -206,8 +204,7 @@ public class Avatar extends Sprite {
 			}
 		};
 
-		pd.setCmd(new CmdObject(this.getX(),this.getY(),"Question").getCommand());
-		pd.setAvatarType("A");
+		pd.cmd = new CmdObject(this.getX(),this.getY(),"Question").getCommand();
 		return pd;
 	}
 
@@ -335,7 +332,6 @@ public class Avatar extends Sprite {
 	protected Vector3 getTarget(){
 		return this.target;
 	}
-
 
 	protected boolean isInTarget() {
 		return this.getTargetDistance() < 16;

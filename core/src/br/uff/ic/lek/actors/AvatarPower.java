@@ -15,7 +15,7 @@ public class AvatarPower {
 
 	public AvatarPower(float f) {
 		power = f;
-		powerIndicator = new ShapeRenderer();
+		powerIndicator = null;
 	}
 
 	public float getPower() {

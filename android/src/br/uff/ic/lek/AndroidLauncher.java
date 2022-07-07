@@ -17,23 +17,41 @@ import com.onesignal.client.auth.*;
 import com.onesignal.client.model.*;
 import com.onesignal.client.api.DefaultApi;
 
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.zip.CRC32;
 
 
 public class AndroidLauncher extends AndroidApplication {
+	public static final List<String> DEVICES = new ArrayList<String>();
+
 	private static final String TAG = "JOGO";
 	private static final String ONESIGNAL_APP_ID = "92576ca0-c121-46bb-a1bc-24ca96e1173d";
 	private static final String ONESIGNAL_API_KEY = "NmRkYTkyZGEtNDQwYS00OTFkLTlhNjgtMDNmYWQxODlhZmY1";
 	private static final String ONESIGNAL_USER_KEY_TOKEN = "YmE4OWIwNDctYzMyYi00MWFkLWI2YmQtYmRjYTA3MDVhZmFh";
+
 	protected String playerNickName;
 	protected String emailCRC32;
 	protected String pwdCRC32;
-	protected int runningTimes;
 	protected String sharedPreferencesName = "ALCH0005";
+
+	protected int runningTimes;
+
+	private FirebaseDatabase database;
+	private DatabaseReference myRef;
+	private DatabaseReference myRefInicial;
+	private DatabaseReference referencia = FirebaseDatabase.getInstance().getReference();
 
 	@Override
 	public void onCreate (Bundle savedInstanceState) {
@@ -49,20 +67,10 @@ public class AndroidLauncher extends AndroidApplication {
 		config.useWakelock = true;
 		config.useAccelerometer = true;
 		useImmersiveMode (true);
-		initialize(
-			new Alquimia(new AndroidInterfaceClass(playerNickName, emailCRC32, pwdCRC32, runningTimes)),
-			config
-		);
-		// Enable verbose OneSignal logging to debug issues if needed.
-		OneSignal.setLogLevel(OneSignal.LOG_LEVEL.VERBOSE, OneSignal.LOG_LEVEL.NONE);
 
-		// OneSignal Initialization
+		OneSignal.setLogLevel(OneSignal.LOG_LEVEL.VERBOSE, OneSignal.LOG_LEVEL.NONE);
 		OneSignal.initWithContext(this);
 		OneSignal.setAppId(ONESIGNAL_APP_ID);
-
-		// GRUPO-01-VERDE: Set User Firebase ID as External ID in OneSignal.
-		PlayerData player = PlayerData.myPlayerData();
-		OneSignal.setExternalUserId(player.getAuthUID());
 
 		try {
 			invitePlayers();
@@ -70,6 +78,10 @@ public class AndroidLauncher extends AndroidApplication {
 			e.printStackTrace();
 		}
 
+		initialize(
+			new Alquimia(new AndroidInterfaceClass(playerNickName, emailCRC32, pwdCRC32, runningTimes)),
+			config
+		);
 	}
 
 	private void invitePlayers () throws ApiException {
@@ -104,14 +116,20 @@ public class AndroidLauncher extends AndroidApplication {
 			e.printStackTrace();
 		}
 
+
+		System.out.println("GONZADga"+thisDeviceId);
 		for (Player player: players.getPlayers()) {
 			if (!player.getId().equals(thisDeviceId))
 				notification.addIncludePlayerIdsItem(player.getId());
+			AndroidLauncher.DEVICES.add(player.getId());
+			System.out.println("player added to devices: " + player.getId());
 		}
+		System.out.println("devices result: "+  AndroidLauncher.DEVICES);
 
 		try {
-			apiInstance.createNotification(notification);
-			System.out.println("OneSignal Invite Sent Successfully!");
+			CreateNotificationSuccessResponse result = apiInstance.createNotification(notification);
+			System.out.println("result is:");
+			System.out.println(result);
 		} catch (ApiException e) {
 			System.err.println("Exception when calling DefaultApi#createNotification");
 			System.err.println("Status code: " + e.getCode());

@@ -76,7 +76,7 @@ public class PathFinderTests extends GdxAiTest {
 	}
 
 	protected void updateStatusBarText (final StringBuilder stringBuilder) {
-		stringBuilder.append("FPS: ").append(Gdx.graphics.getFramesPerSecond());
+		stringBuilder.append("FPS: ").append(10);
 	}
 
 	protected CollapsableWindow addBehaviorSelectionWindow (String title, List<String> testList, float x, float y) {

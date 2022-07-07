@@ -72,9 +72,6 @@ public class ClassToast {
             }
         }
     }
-    //LEKREMOVER */
-
-
 
     private String msg;
     private final BitmapFont font;

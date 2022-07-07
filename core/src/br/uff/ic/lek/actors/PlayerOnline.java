@@ -8,5 +8,8 @@ public class PlayerOnline extends Player {
 		super(sprite, x, y, authUID);
 	}
 
-	protected void move(float delta) { }
+	@Override
+	protected boolean isInTarget() {
+		return true;
+	}
 }

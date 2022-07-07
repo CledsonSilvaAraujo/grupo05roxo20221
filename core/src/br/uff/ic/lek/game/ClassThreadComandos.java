@@ -57,13 +57,15 @@ public class ClassThreadComandos extends Thread implements InterfaceLibGDX {
 	public void parseCmd(String authUID, String cmdJson)  {
 		Object obj = ClassMessage.decodeCurrentPos(cmdJson);
 
-		Boolean isMyPlayerData = authUID.equals(PlayerData.myPlayerData().getAuthUID());
+		System.out.println("YOUKNOW: " + authUID);
+
+		Boolean isMyPlayerData = authUID.equals(World.world.getMainPlayer().getAuthUID());
 		Boolean isMoveTo = ((ClassMessage) obj).getCmd().contentEquals("MOVETO");
 
 		if (isMyPlayerData && isMoveTo) {
-				float x = ((ClassMessage) obj).getPx();
-				float y = ((ClassMessage) obj).getPy();
-				World.world.worldController.comandoMoveTo(x,y);
+			float x = ((ClassMessage) obj).getPx();
+			float y = ((ClassMessage) obj).getPy();
+			World.world.worldController.comandoMoveTo(x,y);
 		}
 
 		System.out.println(
@@ -71,7 +73,6 @@ public class ClassThreadComandos extends Thread implements InterfaceLibGDX {
 			"\n cmd " + ((ClassMessage) obj).getCmd() +
 			" x=" + ((ClassMessage) obj).getPx() +
 			" y=" + ((ClassMessage) obj).getPy() +
-			" z=" + ((ClassMessage) obj).getPz() +
 			" cardNumber=" + ((ClassMessage) obj).getCardNumber() +
 			" uID=" + ((ClassMessage) obj).getuID()
 		);
@@ -79,6 +80,9 @@ public class ClassThreadComandos extends Thread implements InterfaceLibGDX {
 
 	private void processaCmd(ClassComandos elementoFilaComandos) {
 		String cmd = elementoFilaComandos.getCmd();
+
+		if (cmd == null) return;
+
 		String querySource = elementoFilaComandos.getQuerySource();
 
 		if (querySource == InterfaceLibGDX.MY_PLAYER_DATA) {
@@ -97,6 +101,8 @@ public class ClassThreadComandos extends Thread implements InterfaceLibGDX {
 			);
 		}
 
-		parseCmd(elementoFilaComandos.getAuthUID(), cmd);
+		System.out.println("DEVICE_ID: " + ClassThreadComandos.objetoAndroidFireBase.getDeviceId());
+
+		parseCmd(ClassThreadComandos.objetoAndroidFireBase.getDeviceId(), cmd);
 	}
 }

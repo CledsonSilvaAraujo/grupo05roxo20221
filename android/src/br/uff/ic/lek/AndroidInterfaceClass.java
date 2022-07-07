@@ -1,10 +1,10 @@
 package br.uff.ic.lek;
 
+import androidx.annotation.NonNull;
+
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
-
-import androidx.annotation.NonNull;
 
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -13,25 +13,30 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.Calendar;
-import java.util.Dictionary;
-import java.util.Hashtable;
-
-
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.Query;
 
+import com.onesignal.OSDeviceState;
+import com.onesignal.OneSignal;
+
 import br.uff.ic.lek.actors.Avatar;
 import br.uff.ic.lek.game.World;
 
-// para espelhar a tela de seu celular no Ubuntu
-// https://diolinux.com.br/tutoriais/espelhe-tela-do-seu-android-no-seu-linux-com-o-scrcpy.html
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Dictionary;
+import java.util.Hashtable;
+import java.util.List;
 
 
 public class AndroidInterfaceClass extends Activity implements InterfaceAndroidFireBase {
+	public static final String DEVICE_ID = OneSignal.getDeviceState().getUserId();
+
+	public static final List<String> DEVICES = AndroidLauncher.DEVICES;
+
 	private static final String TAG = "JOGO";
 
 	private static InterfaceLibGDX gameLibGDX = null;
@@ -81,6 +86,12 @@ public class AndroidInterfaceClass extends Activity implements InterfaceAndroidF
 	}
 
 	@Override
+	public String getDeviceId() {
+		return AndroidInterfaceClass.DEVICE_ID;
+	}
+
+
+	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		mAuth = FirebaseAuth.getInstance();
@@ -97,9 +108,9 @@ public class AndroidInterfaceClass extends Activity implements InterfaceAndroidF
 		int ultimosUsuarios = 10;
 
 		DatabaseReference players = referencia.child("players");
-		Query playerPesquisa = players.startAt(uID).endAt(uID).orderByChild("authUID").limitToLast(ultimosUsuarios);
+		Query playerQuery = players.orderByChild("gameState").equalTo("WAITING");
 
-		playerPesquisa.addValueEventListener(
+		playerQuery.addValueEventListener(
 			new ValueEventListener() {
 				@Override
 				public void onDataChange(DataSnapshot dataSnapshot) {
@@ -129,27 +140,40 @@ public class AndroidInterfaceClass extends Activity implements InterfaceAndroidF
 
 	@Override
 	public void waitForPlayers(){
-		int ultimosUsuarios = 10;
 		DatabaseReference players = referencia.child("players");
 
-		Query playerPesquisa = players.startAt("READYTOPLAY_-").endAt("READYTOPLAY_~").orderByChild("stateAndLastTime").limitToLast(ultimosUsuarios);
+		Query playerQuery = players.orderByChild("gameState").equalTo("READYTOPLAY");
 
-		playerPesquisa.addValueEventListener(
+		playerQuery.addValueEventListener(
 			new ValueEventListener() {
 				@Override
 				public void onDataChange(DataSnapshot dataSnapshot) {
+
 					for (DataSnapshot zoneSnapshot : dataSnapshot.getChildren()) {
-						Log.d(TAG, "On DataChange for child "+zoneSnapshot.child("authUID").getValue());
 						if (AndroidInterfaceClass.gameLibGDX == null) return;
-						String registrationTime = zoneSnapshot.child("registrationTime").getValue().toString();
-						String authUID = zoneSnapshot.child("authUID").getValue().toString();
-						String lastUpdateTime = zoneSnapshot.child("lastUpdateTime").getValue().toString();
+						if (AndroidInterfaceClass.DEVICE_ID.equals(zoneSnapshot.getKey())) continue;
 
-						String cmd = zoneSnapshot.child("cmd").getValue().toString();
+						Log.d(TAG, "on data change for " + zoneSnapshot.getKey());
 
-						System.out.println("Teste: " + getCmdDictionary(cmd).get("event"));
+						String cmd = (String) zoneSnapshot.child("cmd").getValue();
+						String registrationTime = (String) zoneSnapshot.child("registrationTime").getValue();
+						String lastUpdateTime = (String) zoneSnapshot.child("lastUpdateTime").getValue();
 
-						AndroidInterfaceClass.gameLibGDX.enqueueMessage(InterfaceLibGDX.ALL_PLAYERS_DATA, registrationTime, authUID, cmd, lastUpdateTime);
+						Dictionary<String,String> dic = getCmdDictionary(cmd);
+
+						World.world.createOnlinePlayer(
+							zoneSnapshot.getKey(),
+							Float.parseFloat(dic.get("px")),
+							Float.parseFloat(dic.get("py"))
+						);
+
+						AndroidInterfaceClass.gameLibGDX.enqueueMessage(
+							InterfaceLibGDX.ALL_PLAYERS_DATA,
+							registrationTime,
+							AndroidInterfaceClass.DEVICE_ID,
+							cmd,
+							lastUpdateTime
+						);
 					}
 				}
 
@@ -163,7 +187,8 @@ public class AndroidInterfaceClass extends Activity implements InterfaceAndroidF
 
 	@Override
 	public void writePlayerData(Avatar player){
-		myRef = database.getReference("players").child(player.getAuthUID());
+		player.setAuthUID(AndroidInterfaceClass.DEVICE_ID);
+		myRef = database.getReference("players").child(AndroidInterfaceClass.DEVICE_ID);
 		myRef.setValue(player.getFirebaseData());
 	}
 
@@ -262,44 +287,15 @@ public class AndroidInterfaceClass extends Activity implements InterfaceAndroidF
 
 	private void updateRealTimeDatabaseUserData(FirebaseUser currentUser) {
 		if (currentUser != null) {
-			PlayerData pd = PlayerData.myPlayerData();
-			pd.setAuthUID(uID);
-			pd.setWriterUID(uID);
-			pd.setGameState(PlayerData.States.WAITING);
-			pd.setChat("empty");
-			pd.setAvatarType("A");
-			pd.setCmd("{cmd:BErinjela,px:1.1,py:2.2,pz:3.3,cardNumber:4,uID:"+uID+"}");
+			PlayerData pd = new PlayerData();
+			pd.gameState = PlayerData.States.READYTOPLAY;
+			pd.cmd = "{cmd:startup,px:1.1,py:2.2,pz:3.3,cardNumber:4}";
+			pd.nickName = playerNickName;
+
 			Log.d(TAG,"WAITING");
-			pd.setPlayerNickName(playerNickName);
-			pd.setEmail(email);
 
-			Calendar calendar = Calendar.getInstance();
-			java.util.Date now = calendar.getTime();
-
-			java.sql.Timestamp currentTimestamp = new java.sql.Timestamp(now.getTime());
-
-			pd.setTimestamp(currentTimestamp);
-			pd.setLastUpdateTime("" + now.getTime());
-			pd.setRegistrationTime("" + now.getTime());
-			pd.setStateAndLastTime(pd.getGameState()+"_"+pd.getLastUpdateTime());
-			pd.setRunningTimes(this.runningTimes);
-			Log.d(TAG, "local timestamp:" + currentTimestamp.toString());
-			Log.d(TAG, "System timestamp:" + System.currentTimeMillis());
-
-			myRef = database.getReference("players").child(uID);
-			myRefInicial = database.getReference("playersData").child(uID);
-			if (newAccount){
-				Log.d(TAG, "CONTA NOVA:" + pd.getRegistrationTime());
-				myRef.setValue(pd);
-				myRefInicial.setValue(pd);
-			} else {
-				Log.d(TAG, "CONTA EXISTENTE:" + pd.getRegistrationTime());
-				myRef.setValue(pd);
-			}
-			if (fazSoUmaVez == 0){
-				fazSoUmaVez++;
-			}
-			Log.d(TAG," fazSoUmaVez:"+fazSoUmaVez);
+			myRef = database.getReference("players").child(AndroidInterfaceClass.DEVICE_ID);
+			myRef.setValue(pd);
 		}
 	}
 

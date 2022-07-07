@@ -5,7 +5,6 @@ import br.uff.ic.lek.actors.Avatar;
 import br.uff.ic.lek.actors.Player;
 import br.uff.ic.lek.actors.PlayerLocal;
 import br.uff.ic.lek.actors.PlayerOnline;
-import br.uff.ic.lek.actors.NPC;
 import br.uff.ic.lek.actors.Enemy;
 import br.uff.ic.lek.utils.CameraZoomAdjust;
 import br.uff.ic.lek.utils.ClassToast;
@@ -69,10 +68,12 @@ public class World {
 	public Music backgroundMusic;
 	public PathPlanning pathPlan;
 
+	public String deviceId;
+
 	private PlayerLocal mainPlayer;
 	private List<Avatar> avatars = new ArrayList<Avatar>();
 	private List<Player> players = new ArrayList<Player>();
-	private List<NPC> npcs = new ArrayList<NPC>();
+	private List<PlayerOnline> playersOnline = new ArrayList<PlayerOnline>();
 	private List<Enemy> enemies = new ArrayList<Enemy>();
 	
 	private CameraController controller;
@@ -231,6 +232,15 @@ public class World {
 			this.tiledMapRender.getBatch().begin();
 			avatar.draw(camera, font, "debug", this.tiledMapRender.getBatch());
 			this.tiledMapRender.getBatch().end();
+
+			if (avatar instanceof PlayerOnline) {
+				System.out.println("é porra");
+				System.out.println("player id: " + avatar.getAuthUID());
+				System.out.println("player px: " + avatar.getPosition().x);
+				System.out.println("player py: " + avatar.getPosition().y);
+			} else {
+				System.out.println("não é porra");
+			}
 		}
 
 		World.world.pathPlan.render(delta);
@@ -247,6 +257,25 @@ public class World {
 		Batch batch = this.tiledMapRender.getBatch();
 
 		ClassToast.showToasts(batch);
+	}
+
+	public void createOnlinePlayer(String id, float x, float y) {
+		if (this.getPlayersAmount() >= World.MAX_PLAYERS) {
+			System.out.println("limit of online players reached");
+			return;
+		}
+
+		System.out.println("testing online players: " + id + ", " + x + ", " + y);
+
+		PlayerOnline player = new PlayerOnline(
+			new Sprite(World.atlasPlayerS_W_E_N.findRegion("South02")),
+			x,
+			y,
+			id
+		);
+
+		this.avatars.add(player);
+		this.players.add(player);
 	}
 
 	public OrthographicCamera getCamera() {
@@ -269,10 +298,6 @@ public class World {
 		return this.players;
 	}
 
-	public List<NPC> getNPCs() {
-		return this.npcs;
-	}
-
 	public List<Enemy> getEnemies() {
 		return this.enemies;
 	}
@@ -290,41 +315,12 @@ public class World {
 			new Sprite(World.atlasPlayerS_W_E_N.findRegion("South02")),
 			postion.x,
 			postion.y,
-			PlayerData.myPlayerData().getAuthUID()
+			"123"
 		);
 
 		this.avatars.add(mainPlayer);
 		this.players.add(mainPlayer);
 		this.mainPlayer = mainPlayer;
-	}
-
-	private void createPlayer() {
-		if (this.getPlayersAmount() >= World.MAX_PLAYERS) {
-			System.out.println("Limit of Avatars reached");
-			return;
-		}
-
-		PlayerOnline player = new PlayerOnline(
-			new Sprite(World.atlasPlayerS_W_E_N.findRegion("South02")),
-			avatarStartTileX*World.tileWidth,
-			avatarStartTileY*World.tileHeight,
-			PlayerData.myPlayerData().getAuthUID()
-		);
-
-		this.avatars.add(player);
-		this.players.add(player);
-	}
-
-	private void createNPC() {
-		NPC npc = new NPC(
-			new Sprite(World.atlasPlayerS_W_E_N.findRegion("South02")),
-			avatarStartTileX*World.tileWidth,
-			avatarStartTileY*World.tileHeight,
-			"NPC"
-		);
-
-		this.avatars.add(npc);
-		this.npcs.add(npc);
 	}
 
 	private void createEnemy(Vector2 position) {

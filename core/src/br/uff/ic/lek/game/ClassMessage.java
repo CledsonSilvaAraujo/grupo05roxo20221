@@ -8,11 +8,44 @@ public class ClassMessage {
     private String cmd;
     private float px;
     private float py;
-    private float pz;
     private String uID;
 
     private int cardNumber;
 
+    public ClassMessage(String cmd,float px, float py, int cardNumber) {
+        this.cmd  = cmd ;
+        this.px = px;
+        this.py = py;
+        this.cardNumber = cardNumber;
+    }
+
+    public ClassMessage() { }
+
+    public static String encodeCurrentPos(ClassMessage obj){
+        Json jsonParser = new Json();
+        jsonParser.addClassTag("ClassMesage", ClassMessage.class);
+        String myJSON = jsonParser.toJson(obj);
+        System.out.println("dentro encode: "+myJSON);
+        return myJSON;
+    }
+
+    public static Object decodeCurrentPos(String json){
+        System.out.println("testing again");
+        Json jsonParser = new Json();
+        System.out.println("testing again 1");
+
+        jsonParser.setTypeName("class");
+        jsonParser.setUsePrototypes(false);
+        jsonParser.setIgnoreUnknownFields(true);
+        jsonParser.setOutputType(JsonWriter.OutputType.json);
+        jsonParser.addClassTag("ClassMessage", ClassMessage.class);
+        System.out.println("testing again 2");
+
+        Object obj = jsonParser.fromJson(ClassMessage.class, json);
+        System.out.println("testing again 3");
+
+        return obj;
+    }
 
     public String getuID() {
         return uID;
@@ -27,14 +60,6 @@ public class ClassMessage {
     }
 
     public void setCardNumber(int cardNumber) {
-        this.cardNumber = cardNumber;
-    }
-
-    public ClassMessage(String cmd,float px, float py, float pz, int cardNumber) {
-        this.cmd  = cmd ;
-        this.px = px;
-        this.py = py;
-        this.pz = pz;
         this.cardNumber = cardNumber;
     }
 
@@ -57,31 +82,5 @@ public class ClassMessage {
     }
     public void setPy(float py) {
         this.py = py;
-    }
-    public float getPz() {
-        return pz;
-    }
-    public void setPz(float pz) {
-        this.pz = pz;
-    }
-
-    public static String encodeCurrentPos(ClassMessage obj){
-        Json jsonParser = new Json();
-        jsonParser.addClassTag("ClassMesage", ClassMessage.class);
-        String myJSON = jsonParser.toJson(obj);
-        System.out.println("dentro encode: "+myJSON);
-        return myJSON;
-    }
-
-    public static Object decodeCurrentPos(String json){
-        Json jsonParser = new Json();
-        jsonParser.setTypeName("class");
-        jsonParser.setUsePrototypes(false);
-        jsonParser.setIgnoreUnknownFields(true);
-        jsonParser.setOutputType(JsonWriter.OutputType.json);
-        jsonParser.addClassTag("ClassMessage", ClassMessage.class);
-
-        Object obj = jsonParser.fromJson(ClassMessage.class, json);
-        return obj;
     }
 }

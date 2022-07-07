@@ -3,7 +3,6 @@ package br.uff.ic.lek.game;
 import br.uff.ic.lek.actors.Avatar;
 import br.uff.ic.lek.actors.Player;
 import br.uff.ic.lek.actors.PlayerLocal;
-import br.uff.ic.lek.actors.NPC;
 import br.uff.ic.lek.actors.Enemy;
 import br.uff.ic.lek.actors.Avatar.State;
 
@@ -23,7 +22,6 @@ public class WorldController implements InputProcessor {
 	private PlayerLocal mainPlayer;
 	private List<Avatar> avatars = new ArrayList<Avatar>();
 	private List<Player> players = new ArrayList<Player>();
-	private List<NPC> npcs = new ArrayList<NPC>();
 	private List<Enemy> enemies = new ArrayList<Enemy>();
 
 	private OrthographicCamera camera;
@@ -43,7 +41,6 @@ public class WorldController implements InputProcessor {
 		this.mainPlayer = world.getMainPlayer();
 		this.avatars = world.getAvatars();
 		this.players = world.getPlayers();
-		this.npcs = world.getNPCs();
 		this.enemies = world.getEnemies();
 	}
 
