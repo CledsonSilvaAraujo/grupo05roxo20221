@@ -1,16 +1,18 @@
+
+
 buildscript {
 	repositories {
-		mavenLocal()
-		mavenCentral()
-		gradlePluginPortal()
-		maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
 		google()
+		mavenCentral()
+		mavenLocal()
+		gradlePluginPortal()
 	}
 	
 	dependencies {
-		classpath 'com.android.tools.build:gradle:7.1.2'
+		classpath 'com.android.tools.build:gradle:7.2.0'
 		classpath 'com.google.gms:google-services:4.3.10'
 		classpath 'gradle.plugin.com.onesignal:onesignal-gradle-plugin:[0.12.10, 0.99.99]'
+		classpath 'org.openapitools:onesignal-java-client:1.0.1'
 	}
 }
 
@@ -29,17 +31,14 @@ allprojects {
 	}
 
 	repositories {
-		mavenLocal()
-		mavenCentral()
 		google()
-		gradlePluginPortal()
-		maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
-		maven { url "https://oss.sonatype.org/content/repositories/releases/" }
+		mavenCentral()
+		mavenLocal()
 	}
 }
 
 project(":android") {
-	apply plugin: "com.android.application"
+	apply plugin: 'com.android.application'
 	apply plugin: 'com.google.gms.google-services'
 
 	configurations { natives }
@@ -65,12 +64,16 @@ project(":android") {
 		natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-x86_64"
 		api "com.badlogicgames.gdx-controllers:gdx-controllers-android:$gdxControllersVersion"
 		implementation platform('com.google.firebase:firebase-bom:29.2.1')
-		implementation 'com.google.firebase:firebase-analytics'
-		implementation 'com.onesignal:OneSignal:[4.0.0, 4.99.99]'
-		implementation ("org.openapitools:onesignal-java-client:1.0.1"){
-			exclude group:"javax.ws.rs"
+		implementation platform('com.google.firebase:firebase-analytics')
+		implementation ('com.onesignal:OneSignal:[4.0.0, 4.99.99]')
+		implementation ('org.openapitools:onesignal-java-client:1.0.1') {
 		}
+	}
 
+	configurations.all {
+		resolutionStrategy.dependencySubstitution {
+			substitute module('javax.ws.rs:jsr311-api:1.1.1') with module('javax.ws.rs:javax.ws.rs-api:2.1.1')
+		}
 	}
 }
 
@@ -85,6 +88,6 @@ project(":core") {
 		api "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
 		api "com.badlogicgames.gdx-controllers:gdx-controllers-core:$gdxControllersVersion"
 		api "com.kotcrab.vis:vis-ui:1.3.0"
-
 	}
 }
+
