@@ -27,11 +27,11 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
 
+import br.uff.ic.lek.PlayerData;
 import br.uff.ic.lek.utils.ClassToast;
 
 
 public class ClassCommandButton extends ClassActorAccessor {
-
     public static final int  BT_NONE = 0;
     public static final int  BT_PLAY = 1;
     public static final int  BT_RESIZE = 2;
@@ -40,6 +40,7 @@ public class ClassCommandButton extends ClassActorAccessor {
     public static final int  BT_INFO = 5;
     public static final int  BT_HELP = 6;
     public static final int  BT_EXIT = 7;
+
     protected ShapeRenderer shapeRenderer = new ShapeRenderer();
     protected Sprite frente, fundo;
     protected boolean frontface;
@@ -112,50 +113,37 @@ public class ClassCommandButton extends ClassActorAccessor {
             public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
                 Gdx.app.log("botao", "touchDown " + x + ", " + y + " acao"+action);
                 ClassCommandButton.acaoAtual = action;
-                if (action != ClassCommandButton.BT_RESIZE) {
 
-                    if(action == ClassCommandButton.BT_INTERNET_SEARCH) {
-                        World.disparaAnimacaoCamera(2.5f, 7.0f);
+                if(action == ClassCommandButton.BT_INTERNET_SEARCH) {
+                    World.disparaAnimacaoCamera(2.5f, 7.0f);
+                }
+                else if(action == ClassCommandButton.BT_HELP) {
+                    System.out.println("Avatar " + World.world.getMainPlayer().getX());
+                    ClassThreadComandos.objetoAndroidFireBase.writePlayerData(World.world.getMainPlayer());
+                    Color backgroundColor = new Color(0f, 0f, 0f, 0.5f);
+                    Color fontColor = new Color(1, 1, 0, 0.5f);
+                    String msg = "save device data";
+                    ClassToast.toastRich(msg, backgroundColor, fontColor, 5f);
+                }
+                else if(action == ClassCommandButton.BT_PLAY) {
+                    World.world.getMainPlayer().setFirebaseState(PlayerData.States.PLAYING);
 
-                    }
-                    else if(action == ClassCommandButton.BT_HELP) {
-                        System.out.println("Avatar " + World.world.getMainPlayer().getX());
-                        ClassThreadComandos.objetoAndroidFireBase.writePlayerData(World.world.getMainPlayer());
-                        Color backgroundColor = new Color(0f, 0f, 0f, 0.5f);
-                        Color fontColor = new Color(1, 1, 0, 0.5f);
-                        String msg = "save device data";
-                        ClassToast.toastRich(msg, backgroundColor, fontColor, 5f);
-                    }
-                    else if(action == ClassCommandButton.BT_PLAY) {
-                        ClassHud.btRESIZE.frontface = true;
-                        ClassHud.btINFO.frontface = true;
-                        ClassHud.btINTERNET.frontface = true;
+                    PlayerData data = World.world.getMainPlayer().getFirebaseData();
 
-                        if (executouUmaVez == false) {
-                            executouUmaVez=true;
-                            ClassThreadComandos.objetoAndroidFireBase.waitForPlayers();
-                            ClassThreadComandos.objetoAndroidFireBase.waitForMyMessages();
-                            Color backgroundColor = new Color(0f, 0f, 0f, 0.5f);
-                            Color fontColor = new Color(1, 1, 0, 0.5f);
-                            String msg = "ready to listen firebase";
-                            ClassToast.toastRich(msg, backgroundColor, fontColor, 5f);
-                        }
-                    }
-                    else if(action == ClassCommandButton.BT_SOUND) {
-                        System.out.println("SOUND");
-                        ClassThreadComandos.objetoAndroidFireBase.waitForPlayers();
-                        Color backgroundColor = new Color(0f, 0f, 0f, 0.5f);
-                        Color fontColor = new Color(1, 1, 0, 0.5f);
-                        ClassToast.toastRich(
+                    ClassThreadComandos.objetoAndroidFireBase.writePlayerData(World.world.getMainPlayer());
+                    ClassThreadComandos.objetoAndroidFireBase.writePartyData(World.world.getMainPlayer());
+                    ClassThreadComandos.objetoAndroidFireBase.waitForPlayers();
+                    Color backgroundColor = new Color(0f, 0f, 0f, 0.5f);
+                    Color fontColor = new Color(1, 1, 0, 0.5f);
+                    ClassToast.toastRich(
                             "getting players",
                             backgroundColor,
                             fontColor,
                             5f
-                        );
-                    }
-                    else if(action == ClassCommandButton.BT_EXIT) {
-                        ClassThreadComandos.objetoAndroidFireBase.finishAndRemoveTask();
-                    }
+                    );
+                }
+                else if(action == ClassCommandButton.BT_EXIT) {
+                    ClassThreadComandos.objetoAndroidFireBase.finishAndRemoveTask();
                 }
             }
         });

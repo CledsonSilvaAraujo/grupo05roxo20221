@@ -3,7 +3,6 @@ package br.uff.ic.lek.game;
 import br.uff.ic.lek.Alquimia;
 import br.uff.ic.lek.InterfaceAndroidFireBase;
 import br.uff.ic.lek.InterfaceLibGDX;
-import br.uff.ic.lek.PlayerData;
 import br.uff.ic.lek.utils.ClassToast;
 
 import com.badlogic.gdx.graphics.Color;

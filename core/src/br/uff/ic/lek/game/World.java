@@ -120,11 +120,11 @@ public class World {
 		World.atlasPlayerSW_NW_SE_NE = this.assets.get("img/guerreiraSW_NW_SE_NE_210x280.pack");
 
 		this.createMainPlayer(new Vector2(3968,256));
-		this.createEnemy(new Vector2(200,20));
-		this.createEnemy(new Vector2(180,50));
-		this.createEnemy(new Vector2(140,100));
-		this.createEnemy(new Vector2(120,130));
-		this.createEnemy(new Vector2(100,180));
+//		this.createEnemy(new Vector2(200,20));
+//		this.createEnemy(new Vector2(180,50));
+//		this.createEnemy(new Vector2(140,100));
+//		this.createEnemy(new Vector2(120,130));
+//		this.createEnemy(new Vector2(100,180));
 		
 		World.camera = new OrthographicCamera(this.mainPlayer.getX(), this.mainPlayer.getY());
 		World.camera.zoom = 0.5f;
@@ -232,15 +232,6 @@ public class World {
 			this.tiledMapRender.getBatch().begin();
 			avatar.draw(camera, font, "debug", this.tiledMapRender.getBatch());
 			this.tiledMapRender.getBatch().end();
-
-			if (avatar instanceof PlayerOnline) {
-				System.out.println("é porra");
-				System.out.println("player id: " + avatar.getAuthUID());
-				System.out.println("player px: " + avatar.getPosition().x);
-				System.out.println("player py: " + avatar.getPosition().y);
-			} else {
-				System.out.println("não é porra");
-			}
 		}
 
 		World.world.pathPlan.render(delta);
@@ -265,8 +256,6 @@ public class World {
 			return;
 		}
 
-		System.out.println("testing online players: " + id + ", " + x + ", " + y);
-
 		PlayerOnline player = new PlayerOnline(
 			new Sprite(World.atlasPlayerS_W_E_N.findRegion("South02")),
 			x,
@@ -276,6 +265,7 @@ public class World {
 
 		this.avatars.add(player);
 		this.players.add(player);
+		this.playersOnline.add(player);
 	}
 
 	public OrthographicCamera getCamera() {
@@ -304,6 +294,24 @@ public class World {
 
 	public void setMainPlayerTarget(Vector3 target) {
 		this.mainPlayer.setTarget(target);
+	}
+
+	public void setOnlinePlayerTarget(String id, float x, float y) {
+		for (PlayerOnline player : this.playersOnline) {
+			if (id.equals(player.getAuthUID())) {
+				player.setTarget(new Vector3(x, y, 0));
+				return;
+			}
+		}
+	}
+
+	public void setOnlinePlayerPosition(String id, float x, float y) {
+		for (PlayerOnline player : this.playersOnline) {
+			if (id.equals(player.getAuthUID())) {
+				player.setPosition(x, y);
+				return;
+			}
+		}
 	}
 
 	private int getPlayersAmount() {

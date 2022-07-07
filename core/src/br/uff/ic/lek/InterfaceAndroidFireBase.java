@@ -6,6 +6,7 @@ public interface InterfaceAndroidFireBase {
     String getDeviceId();
     void setLibGDXScreen(InterfaceLibGDX libGDXScreen);
     void writePlayerData(Avatar player);
+    void writePartyData(Avatar player);
     void waitForMyMessages();
     void waitForPlayers();
     void finishAndRemoveTask();

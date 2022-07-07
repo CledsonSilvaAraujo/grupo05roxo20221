@@ -82,14 +82,13 @@ public class AndroidInterfaceClass extends Activity implements InterfaceAndroidF
 
 		currentUserDefined(currentUser);
 
-		updateRealTimeDatabaseUserData(currentUser);
+//		updateRealTimeDatabaseUserData(currentUser);
 	}
 
 	@Override
 	public String getDeviceId() {
 		return AndroidInterfaceClass.DEVICE_ID;
 	}
-
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -140,55 +139,94 @@ public class AndroidInterfaceClass extends Activity implements InterfaceAndroidF
 
 	@Override
 	public void waitForPlayers(){
+		DatabaseReference parties = referencia.child("parties");
 		DatabaseReference players = referencia.child("players");
 
-		Query playerQuery = players.orderByChild("gameState").equalTo("READYTOPLAY");
+		Query playerCreationQuery = parties.orderByChild("one");
+		Query playerUpdateQuery = players.orderByChild("gameState").equalTo("PLAYING");
 
-		playerQuery.addValueEventListener(
-			new ValueEventListener() {
-				@Override
-				public void onDataChange(DataSnapshot dataSnapshot) {
+		ValueEventListener onlinePlayersCreation = new ValueEventListener() {
+			@Override
+			public void onDataChange(DataSnapshot dataSnapshot) {
 
-					for (DataSnapshot zoneSnapshot : dataSnapshot.getChildren()) {
-						if (AndroidInterfaceClass.gameLibGDX == null) return;
-						if (AndroidInterfaceClass.DEVICE_ID.equals(zoneSnapshot.getKey())) continue;
+				for (DataSnapshot zoneSnapshot : dataSnapshot.getChildren()) {
+					if (AndroidInterfaceClass.gameLibGDX == null) return;
 
-						Log.d(TAG, "on data change for " + zoneSnapshot.getKey());
+					for (DataSnapshot player : zoneSnapshot.getChildren()) {
+						if (AndroidInterfaceClass.DEVICE_ID.equals(player.getKey())) continue;
 
-						String cmd = (String) zoneSnapshot.child("cmd").getValue();
-						String registrationTime = (String) zoneSnapshot.child("registrationTime").getValue();
-						String lastUpdateTime = (String) zoneSnapshot.child("lastUpdateTime").getValue();
+						Log.d(TAG, "on data creation for " + player.getKey());
+
+						String cmd = (String) player.child("cmd").getValue();
 
 						Dictionary<String,String> dic = getCmdDictionary(cmd);
 
 						World.world.createOnlinePlayer(
-							zoneSnapshot.getKey(),
+							player.getKey(),
 							Float.parseFloat(dic.get("px")),
 							Float.parseFloat(dic.get("py"))
 						);
 
 						AndroidInterfaceClass.gameLibGDX.enqueueMessage(
 							InterfaceLibGDX.ALL_PLAYERS_DATA,
-							registrationTime,
+							null,
 							AndroidInterfaceClass.DEVICE_ID,
 							cmd,
-							lastUpdateTime
+							null
 						);
 					}
 				}
+			}
 
-				@Override
-				public void onCancelled(DatabaseError databaseError) {
-						Log.i(TAG, "playerPesquisa.addValueEventListener onCancelled", databaseError.toException());
+			@Override
+			public void onCancelled(DatabaseError databaseError) {
+				Log.i(TAG, "playerPesquisa.addValueEventListener onCancelled", databaseError.toException());
+			}
+		};
+
+		ValueEventListener onlinePlayersUpdate = new ValueEventListener() {
+			@Override
+			public void onDataChange(DataSnapshot dataSnapshot) {
+
+				for (DataSnapshot zoneSnapshot : dataSnapshot.getChildren()) {
+					if (AndroidInterfaceClass.gameLibGDX == null) return;
+					if (AndroidInterfaceClass.DEVICE_ID.equals(zoneSnapshot.getKey())) continue;
+
+					Log.d(TAG, "on data change for " + zoneSnapshot.getKey());
+
+					String cmd = (String) zoneSnapshot.child("cmd").getValue();
+					Dictionary<String,String> dic = getCmdDictionary(cmd);
+
+					World.world.setOnlinePlayerTarget(
+						zoneSnapshot.getKey(),
+						Float.parseFloat(dic.get("tx")),
+						Float.parseFloat(dic.get("ty"))
+					);
 				}
 			}
-		);
+
+			@Override
+			public void onCancelled(DatabaseError databaseError) {
+				Log.i(TAG, "playerPesquisa.addValueEventListener onCancelled", databaseError.toException());
+			}
+		};
+
+		playerCreationQuery.addValueEventListener(onlinePlayersCreation);
+		playerUpdateQuery.addValueEventListener(onlinePlayersUpdate);
 	}
 
 	@Override
 	public void writePlayerData(Avatar player){
 		player.setAuthUID(AndroidInterfaceClass.DEVICE_ID);
 		myRef = database.getReference("players").child(AndroidInterfaceClass.DEVICE_ID);
+		myRef.setValue(player.getFirebaseData());
+	}
+
+	@Override
+	public void writePartyData(Avatar player) {
+		myRef = database.getReference("parties")
+				.child(player.getFirebaseData().party)
+				.child(player.getAuthUID());
 		myRef.setValue(player.getFirebaseData());
 	}
 
@@ -288,8 +326,8 @@ public class AndroidInterfaceClass extends Activity implements InterfaceAndroidF
 	private void updateRealTimeDatabaseUserData(FirebaseUser currentUser) {
 		if (currentUser != null) {
 			PlayerData pd = new PlayerData();
-			pd.gameState = PlayerData.States.READYTOPLAY;
-			pd.cmd = "{cmd:startup,px:1.1,py:2.2,pz:3.3,cardNumber:4}";
+			pd.gameState = PlayerData.States.READY;
+			pd.cmd = "{cmd:startup,px:1.1,py:2.2,pz:3.3}";
 			pd.nickName = playerNickName;
 
 			Log.d(TAG,"WAITING");
@@ -300,6 +338,7 @@ public class AndroidInterfaceClass extends Activity implements InterfaceAndroidF
 	}
 
 	private Dictionary<String,String> getCmdDictionary(String cmd) {
+		if (cmd == null) return null;
 		cmd = cmd.replaceAll("\\{","");
 		cmd = cmd.replaceAll("\\}","");
 		String[] params = cmd.split(",");

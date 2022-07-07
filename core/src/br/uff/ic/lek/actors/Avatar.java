@@ -28,14 +28,15 @@ public class Avatar extends Sprite {
 		IDLE, WALKING, DYING
 	}
 
-	private String authUID;
-	private State state = State.IDLE;
-	private AvatarPower avatarPower;
+	protected String authUID;
+	protected State state = State.IDLE;
+	protected PlayerData.States firebaseState = PlayerData.States.READY;
+	protected AvatarPower avatarPower;
 
-	private Compass orientation;
-	private Vector3 position = new Vector3(0,0,0);
-	private Vector3 target = new Vector3(0,0,0);
-	private Vector3 speed = new Vector3(0,0,0);
+	protected Compass orientation;
+	protected Vector3 position = new Vector3(0,0,0);
+	protected Vector3 target = new Vector3(0,0,0);
+	protected Vector3 speed = new Vector3(0,0,0);
 
 	private float elapsedTime;
 	private float tempoAcumulado;
@@ -190,13 +191,14 @@ public class Avatar extends Sprite {
 	public PlayerData getFirebaseData() {
 		PlayerData pd = new PlayerData();
 		pd.nickName = "xXSHADOWXx";
-		pd.gameState = PlayerData.States.READYTOPLAY;
+		pd.party = "one";
+		pd.gameState = this.firebaseState;
 
 		class CmdObject {
 			private String command;
 
-			public CmdObject(Float px, Float py,String event){
-				this.command = "{cmd:"+event+",px:"+ px +",py:"+py+"}";
+			public CmdObject(String event, Float px, Float py, Float tx, Float ty){
+				this.command = "{cmd:"+event+",px:"+ px +",py:"+py+",tx:"+ tx +",ty:"+ty+"}";
 			}
 
 			public String getCommand() {
@@ -204,12 +206,22 @@ public class Avatar extends Sprite {
 			}
 		};
 
-		pd.cmd = new CmdObject(this.getX(),this.getY(),"Question").getCommand();
+		pd.cmd = new CmdObject(
+			"any",
+			this.getPosition().x,
+			this.getPosition().y,
+			this.getTarget().x,
+			this.getTarget().y
+		).getCommand();
 		return pd;
 	}
 
 	public void setState(State state) {
 		this.state = state;
+	}
+
+	public void setFirebaseState(PlayerData.States state) {
+		this.firebaseState = state;
 	}
 
 	public void setAuthUID(String authUID) {

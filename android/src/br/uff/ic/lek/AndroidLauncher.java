@@ -71,7 +71,7 @@ public class AndroidLauncher extends AndroidApplication {
 		OneSignal.setLogLevel(OneSignal.LOG_LEVEL.VERBOSE, OneSignal.LOG_LEVEL.NONE);
 		OneSignal.initWithContext(this);
 		OneSignal.setAppId(ONESIGNAL_APP_ID);
-
+		OneSignal.setExternalUserId("12341134123");
 		try {
 			invitePlayers();
 		} catch (ApiException e) {
@@ -116,15 +116,12 @@ public class AndroidLauncher extends AndroidApplication {
 			e.printStackTrace();
 		}
 
-
-		System.out.println("GONZADga"+thisDeviceId);
+		System.out.println("THIS DEVICE: " + thisDeviceId);
 		for (Player player: players.getPlayers()) {
 			if (!player.getId().equals(thisDeviceId))
 				notification.addIncludePlayerIdsItem(player.getId());
 			AndroidLauncher.DEVICES.add(player.getId());
-			System.out.println("player added to devices: " + player.getId());
 		}
-		System.out.println("devices result: "+  AndroidLauncher.DEVICES);
 
 		try {
 			CreateNotificationSuccessResponse result = apiInstance.createNotification(notification);
