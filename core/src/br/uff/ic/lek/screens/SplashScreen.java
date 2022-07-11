@@ -52,6 +52,12 @@ public class SplashScreen implements Screen {
     public static String USER;
     public static String PARTY;
     private Texture texture = new Texture(Gdx.files.internal("img/numberfive.jpg"));
+    private Texture textureLog= new Texture(Gdx.files.internal("img/TinyLuck1.png"));
+    private Texture textureUser=new Texture(Gdx.files.internal("img/Usuario.png"));
+    private Texture textureParty=new Texture(Gdx.files.internal("img/Sala.png"));
+    private Image sala = new Image(textureParty);
+    private Image usuario =new Image(textureUser);
+    private Image tittle = new Image(textureLog);
     private Image splashImage = new Image(texture);
     private Stage stage = new Stage();
     private PlayScreen ps;
@@ -63,12 +69,22 @@ public class SplashScreen implements Screen {
         // If the image is not the same size as the screen
         this.splashImage.setWidth(Gdx.graphics.getWidth());
         this.splashImage.setHeight(Gdx.graphics.getHeight());
+        this.tittle.setWidth(1000);
+        this.tittle.setHeight(500);
+        this.tittle.setPosition(170,275);
+        this.usuario.setWidth(93);
+        this.usuario.setHeight(25);
+        this.usuario.setPosition(Gdx.graphics.getWidth()/2-200,Gdx.graphics.getHeight()/2+125);
+        this.sala.setWidth(56);
+        this.sala.setHeight(23);
+        this.sala.setPosition(Gdx.graphics.getWidth()/2-200,Gdx.graphics.getHeight()/8+220);
         ps = new PlayScreen();
         Gdx.input.setInputProcessor(this.stage);
         Skin skin =new Skin(Gdx.files.internal("skin/uiskin.json"));
         TextButton btnLogin = new TextButton("clike me",skin);
-        btnLogin.setPosition(Gdx.graphics.getWidth()/2-200,Gdx.graphics.getHeight()/5);
+        btnLogin.setPosition(Gdx.graphics.getWidth()/2-200,Gdx.graphics.getHeight()/9.5f);
         btnLogin.setSize(400,100);
+
 
         username= new TextField("",skin);
         username.setPosition(Gdx.graphics.getWidth()/2-200,Gdx.graphics.getHeight()/5+240);
@@ -76,12 +92,14 @@ public class SplashScreen implements Screen {
 
 
         party= new TextField("",skin);
-        party.setPosition(Gdx.graphics.getWidth()/2-200,Gdx.graphics.getHeight()/5+120);
+        party.setPosition(Gdx.graphics.getWidth()/2-200,Gdx.graphics.getHeight()/8+120);
         party.setSize(400,100);
         ;
 
         this.stage.addActor(splashImage);
-
+        this.stage.addActor(tittle);
+        stage.addActor(sala);
+        stage.addActor(usuario);
         stage.addActor(username);
         stage.addActor(party);
         stage.addActor(btnLogin);

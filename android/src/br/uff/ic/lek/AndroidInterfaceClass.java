@@ -218,6 +218,7 @@ public class AndroidInterfaceClass extends Activity implements InterfaceAndroidF
 	@Override
 	public void writePlayerData(Avatar player){
 		player.setAuthUID(AndroidInterfaceClass.DEVICE_ID);
+		//if(player.getFirebaseStatus()!=PLAYING)return;
 		while(AndroidInterfaceClass.DEVICE_ID==null) {
 		}
 		myRef = database.getReference("players").child(AndroidInterfaceClass.DEVICE_ID);
