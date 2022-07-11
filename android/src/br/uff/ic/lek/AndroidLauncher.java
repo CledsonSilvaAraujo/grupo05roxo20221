@@ -77,7 +77,7 @@ public class AndroidLauncher extends AndroidApplication {
 		} catch (ApiException e) {
 			e.printStackTrace();
 		}
-
+		super.onCreate(savedInstanceState);
 		initialize(
 			new Alquimia(new AndroidInterfaceClass(playerNickName, emailCRC32, pwdCRC32, runningTimes)),
 			config

@@ -30,6 +30,7 @@ import java.util.Calendar;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 
 public class AndroidInterfaceClass extends Activity implements InterfaceAndroidFireBase {
@@ -218,6 +219,8 @@ public class AndroidInterfaceClass extends Activity implements InterfaceAndroidF
 	@Override
 	public void writePlayerData(Avatar player){
 		player.setAuthUID(AndroidInterfaceClass.DEVICE_ID);
+		while(AndroidInterfaceClass.DEVICE_ID==null) {
+		}
 		myRef = database.getReference("players").child(AndroidInterfaceClass.DEVICE_ID);
 		myRef.setValue(player.getFirebaseData());
 	}

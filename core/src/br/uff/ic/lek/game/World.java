@@ -84,6 +84,7 @@ public class World {
 	private BitmapFont font;
 
 	private World() {
+		this.batch=new SpriteBatch();
 		ClassToast.initToastFactory();
 		Color backgroundColor = new Color(0f, 0f, 0f, 0.5f);
 		Color fontColor = new Color(1, 1, 0, 0.5f);
@@ -143,7 +144,7 @@ public class World {
 		World.tweenManager = new TweenManager();
 		world.worldController = new WorldController(World.world);
 
-		world.batch = new SpriteBatch();
+
 		new ClassHud(world.batch);
 		world.controller = new CameraController();
 		world.gestureDetector = new GestureDetector(20, 0.5f, 2, 0.15f, world.controller);

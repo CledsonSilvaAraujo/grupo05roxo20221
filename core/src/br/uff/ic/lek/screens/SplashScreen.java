@@ -15,15 +15,26 @@
  */
 package br.uff.ic.lek.screens;
 
-import br.uff.ic.lek.game.World;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeType;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Align;
+
+import br.uff.ic.lek.game.World;
 
 public class SplashScreen implements Screen {
 
@@ -38,19 +49,53 @@ public class SplashScreen implements Screen {
 
 	 */
 
-    private Texture texture = new Texture(Gdx.files.internal("img/guerreira3.png"));
+    private Texture texture = new Texture(Gdx.files.internal("img/numberfive.jpg"));
     private Image splashImage = new Image(texture);
     private Stage stage = new Stage();
     private PlayScreen ps;
-
+    private TextField username;
+    private TextField password;
+    private Label statusLabel;
+    private BitmapFont font;
     @Override
     public void show() {
         // If the image is not the same size as the screen
         this.splashImage.setWidth(Gdx.graphics.getWidth());
         this.splashImage.setHeight(Gdx.graphics.getHeight());
-
         ps = new PlayScreen();
+        Gdx.input.setInputProcessor(this.stage);
+        Skin skin =new Skin(Gdx.files.internal("skin/uiskin.json"));
+        TextButton btnLogin = new TextButton("clike me",skin);
+        btnLogin.setPosition(Gdx.graphics.getWidth()/2-200,Gdx.graphics.getHeight()/5);
+        btnLogin.setSize(400,100);
+
+        username= new TextField("",skin);
+        username.setPosition(Gdx.graphics.getWidth()/2-200,Gdx.graphics.getHeight()/5+240);
+        username.setSize(400,100);
+
+        password= new TextField("",skin);
+        password.setPosition(Gdx.graphics.getWidth()/2-200,Gdx.graphics.getHeight()/5+120);
+        password.setSize(400,100);
+
+        this.stage.addActor(splashImage);
+
+        stage.addActor(password);
+        stage.addActor(username);
+        stage.addActor(btnLogin);
+
+        btnLogin.addListener(new ClickListener(){
+            @Override
+            public void touchUp(InputEvent e, float x, float y, int point, int button){
+                criamundo();
+            }
+        });
+
+
+
+    }
+    public void criamundo(){
         this.stage.addActor(splashImage); // adds the image as an actor to the stage
+
         this.splashImage.addAction(
                 Actions.sequence(
                         Actions.alpha(0.0f),
@@ -58,6 +103,7 @@ public class SplashScreen implements Screen {
                         Actions.run(new Runnable() { //Actions.delay(1) Actions.alpha(0.0f),
                                         @Override
                                         public void run() {
+
                                             World.load();	// leva um tempo para carregar. Enquanto isso splash esta sendo exibido
                                             //Gdx.app.log(" ", " carregando!");
                                         }
