@@ -6,7 +6,6 @@ import com.badlogic.gdx.math.Vector3;
 import br.uff.ic.lek.PlayerData;
 import br.uff.ic.lek.game.ClassThreadComandos;
 
-
 public class PlayerLocal extends Player {
 	public PlayerLocal(Sprite sprite, float x, float y, String authUID) {
 		super(sprite, x, y, authUID);

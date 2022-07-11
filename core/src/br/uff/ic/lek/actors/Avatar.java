@@ -2,6 +2,7 @@ package br.uff.ic.lek.actors;
 
 import br.uff.ic.lek.PlayerData;
 import br.uff.ic.lek.game.World;
+import br.uff.ic.lek.screens.SplashScreen;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Peripheral;
@@ -190,8 +191,8 @@ public class Avatar extends Sprite {
 
 	public PlayerData getFirebaseData() {
 		PlayerData pd = new PlayerData();
-		pd.nickName = "xXSHADOWXx";
-		pd.party = "one";
+		pd.party = SplashScreen.PARTY;
+		pd.username= SplashScreen.USER;
 		pd.gameState = this.firebaseState;
 
 		class CmdObject {

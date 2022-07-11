@@ -71,7 +71,6 @@ public class AndroidLauncher extends AndroidApplication {
 		OneSignal.setLogLevel(OneSignal.LOG_LEVEL.VERBOSE, OneSignal.LOG_LEVEL.NONE);
 		OneSignal.initWithContext(this);
 		OneSignal.setAppId(ONESIGNAL_APP_ID);
-		OneSignal.setExternalUserId("12341134123");
 		try {
 			invitePlayers();
 		} catch (ApiException e) {

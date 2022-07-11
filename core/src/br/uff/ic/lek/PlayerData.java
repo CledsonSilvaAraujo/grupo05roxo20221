@@ -6,7 +6,7 @@ import java.sql.Timestamp;
 
 
 public class PlayerData {
-    public String nickName;
+    public String username;
     public States gameState;
     public String cmd;
     public String party;

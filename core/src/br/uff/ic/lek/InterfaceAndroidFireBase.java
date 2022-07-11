@@ -10,4 +10,5 @@ public interface InterfaceAndroidFireBase {
     void waitForMyMessages();
     void waitForPlayers();
     void finishAndRemoveTask();
+    void signIn(String email,String username);
 }

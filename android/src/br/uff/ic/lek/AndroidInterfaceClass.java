@@ -72,7 +72,7 @@ public class AndroidInterfaceClass extends Activity implements InterfaceAndroidF
 			try {
 				this.createAccount(emailCRC32, pwdCRC32);
 				Log.d(TAG, "criou um novo auth com email:" + emailCRC32 + " pwd:" + pwdCRC32);
-				this.signIn(emailCRC32, pwdCRC32);
+		//		this.signIn(emailCRC32, pwdCRC32);
 				newAccount = true;
 			} catch (Exception e) {
 				Log.d(TAG, "Exception signIn " + e.getMessage());
@@ -83,7 +83,6 @@ public class AndroidInterfaceClass extends Activity implements InterfaceAndroidF
 
 		currentUserDefined(currentUser);
 
-//		updateRealTimeDatabaseUserData(currentUser);
 	}
 
 	@Override
@@ -260,26 +259,21 @@ public class AndroidInterfaceClass extends Activity implements InterfaceAndroidF
 			});
 	}
 
-	private void signIn(String email, String password) {
-		System.out.println("*********************************");
-		System.out.println("***** "+email+" ***** "+password);
 
-		mAuth.signInWithEmailAndPassword(email, password)
-			.addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-				@Override
-				public void onComplete(@NonNull Task<AuthResult> task) {
-					if (task.isSuccessful()) {
-						Log.d(TAG, "signInWithEmail:success"+email+" "+password);
-						FirebaseUser currentUser = mAuth.getCurrentUser();
-						updateUI(currentUser);
-					} else {
-						System.out.println("*********************************");
-						System.out.println("***** "+email+" ***** "+password);
-						Log.d(TAG, "signInWithEmail:failure"+email+" "+password, task.getException());
-						updateUI(null);
-					}
-				}
-			});
+	@Override
+	public void signIn(String username,String party) {
+		class FireBaseData {
+			public String username;
+			public String party;
+
+			public FireBaseData(String username,String party){
+				this.username=username;
+				this.party=party;
+			}
+		}
+
+		myRef = database.getReference("players").child(AndroidInterfaceClass.DEVICE_ID);
+		myRef.setValue(new FireBaseData(username,party));
 	}
 
 	private void sendEmailVerification() {
@@ -299,7 +293,7 @@ public class AndroidInterfaceClass extends Activity implements InterfaceAndroidF
 		email = currentUser.getEmail();
 		Log.d(TAG, "updateUI providerID:" + providerID + " uID:" + uID + " email:" + email);
 		currentUserDefined(currentUser);
-		updateRealTimeDatabaseUserData(currentUser);
+
 	}
 
 	private void currentUserDefined(FirebaseUser currentUser) {
@@ -326,19 +320,6 @@ public class AndroidInterfaceClass extends Activity implements InterfaceAndroidF
 		Log.d(TAG, "Use SQLite to save email=" + email + " pwd=" + pwd + " uID=" + uID);
 	}
 
-	private void updateRealTimeDatabaseUserData(FirebaseUser currentUser) {
-		if (currentUser != null) {
-			PlayerData pd = new PlayerData();
-			pd.gameState = PlayerData.States.READY;
-			pd.cmd = "{cmd:startup,px:1.1,py:2.2,pz:3.3}";
-			pd.nickName = playerNickName;
-
-			Log.d(TAG,"WAITING");
-
-			myRef = database.getReference("players").child(AndroidInterfaceClass.DEVICE_ID);
-			myRef.setValue(pd);
-		}
-	}
 
 	private Dictionary<String,String> getCmdDictionary(String cmd) {
 		if (cmd == null) return null;

@@ -32,6 +32,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import br.uff.ic.lek.game.ClassThreadComandos;
 import com.badlogic.gdx.utils.Align;
 
 import br.uff.ic.lek.game.World;
@@ -48,15 +49,15 @@ public class SplashScreen implements Screen {
 
 
 	 */
-
+    public static String USER;
+    public static String PARTY;
     private Texture texture = new Texture(Gdx.files.internal("img/numberfive.jpg"));
     private Image splashImage = new Image(texture);
     private Stage stage = new Stage();
     private PlayScreen ps;
+    private TextField party;
     private TextField username;
-    private TextField password;
-    private Label statusLabel;
-    private BitmapFont font;
+
     @Override
     public void show() {
         // If the image is not the same size as the screen
@@ -73,19 +74,24 @@ public class SplashScreen implements Screen {
         username.setPosition(Gdx.graphics.getWidth()/2-200,Gdx.graphics.getHeight()/5+240);
         username.setSize(400,100);
 
-        password= new TextField("",skin);
-        password.setPosition(Gdx.graphics.getWidth()/2-200,Gdx.graphics.getHeight()/5+120);
-        password.setSize(400,100);
+
+        party= new TextField("",skin);
+        party.setPosition(Gdx.graphics.getWidth()/2-200,Gdx.graphics.getHeight()/5+120);
+        party.setSize(400,100);
+        ;
 
         this.stage.addActor(splashImage);
 
-        stage.addActor(password);
         stage.addActor(username);
+        stage.addActor(party);
         stage.addActor(btnLogin);
 
         btnLogin.addListener(new ClickListener(){
             @Override
             public void touchUp(InputEvent e, float x, float y, int point, int button){
+                USER=username.getText();
+                PARTY=party.getText();
+                System.out.println("esse é o ususario: "+USER+ " essa é a sala: "+ PARTY);
                 criamundo();
             }
         });
