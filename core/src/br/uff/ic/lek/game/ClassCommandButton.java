@@ -132,7 +132,7 @@ public class ClassCommandButton extends ClassActorAccessor {
 
                     ClassThreadComandos.objetoAndroidFireBase.writePlayerData(World.world.getMainPlayer());
                     ClassThreadComandos.objetoAndroidFireBase.writePartyData(World.world.getMainPlayer());
-                    ClassThreadComandos.objetoAndroidFireBase.waitForPlayers();
+                    ClassThreadComandos.objetoAndroidFireBase.waitForPlayers(World.world.getMainPlayer().getFirebaseData().party);
                     Color backgroundColor = new Color(0f, 0f, 0f, 0.5f);
                     Color fontColor = new Color(1, 1, 0, 0.5f);
                     ClassToast.toastRich(

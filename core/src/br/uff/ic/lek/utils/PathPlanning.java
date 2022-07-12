@@ -98,7 +98,7 @@ public class PathPlanning {
 						int num = RandomNumber.random(min, max);
 						if (num > maiorValorEncontrado) {
 							maiorValorEncontrado = num;
-							avatarX = i-1;// posicao base do avatar é canto inferior esquerdo
+							avatarX = i-1;
 							avatarY = j-1;
 							System.out.println("maior valor de caverna até agora=" + maiorValorEncontrado + " posX=" + avatarX + " posY=" + avatarY);
 						}

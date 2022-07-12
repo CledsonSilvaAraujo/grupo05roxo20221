@@ -49,13 +49,13 @@ public class FlatTiledGraph implements TiledGraph<FlatTiledNode> {
         //LEK	int map[][] = DungeonUtils.generate(sizeX, sizeY, roomCount, roomMinSize, roomMaxSize, squashIterations);
         for (int x = 0; x < FlatTiledGraph.sizeX; x++) {
             for (int y = 0; y < FlatTiledGraph.sizeY; y++) {
-                if (x==0 || y==0 || x== FlatTiledGraph.sizeX-1 || y== FlatTiledGraph.sizeY-1) // LEK
+                if (x==0 || y==0 || x== FlatTiledGraph.sizeX-1 || y== FlatTiledGraph.sizeY-1)
                     map[x][y] = 0; // limites do map com 0
                 nodes.add(new FlatTiledNode(x, y, map[x][y], 4));
             }
         }
         Gdx.app.log("Path ", " FlatTiledGraph.sizeX="+FlatTiledGraph.sizeX + " FlatTiledGraph.sizeY="+FlatTiledGraph.sizeY);
-        //*
+
         // Each node has up to 4 neighbors, therefore no diagonal movement is possible
         for (int x = 0; x < FlatTiledGraph.sizeX; x++) {
             int idx = x * FlatTiledGraph.sizeY;

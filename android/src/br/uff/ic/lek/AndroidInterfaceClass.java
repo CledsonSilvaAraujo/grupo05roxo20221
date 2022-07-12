@@ -5,6 +5,7 @@ import androidx.annotation.NonNull;
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
+import android.window.SplashScreen;
 
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -138,11 +139,11 @@ public class AndroidInterfaceClass extends Activity implements InterfaceAndroidF
 	}
 
 	@Override
-	public void waitForPlayers(){
+	public void waitForPlayers(String party){
 		DatabaseReference parties = referencia.child("parties");
 		DatabaseReference players = referencia.child("players");
 
-		Query playerCreationQuery = parties.orderByChild("one");
+		Query playerCreationQuery = parties.orderByChild(party);
 		Query playerUpdateQuery = players.orderByChild("gameState").equalTo("PLAYING");
 
 		ValueEventListener onlinePlayersCreation = new ValueEventListener() {

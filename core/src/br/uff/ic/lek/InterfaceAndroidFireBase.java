@@ -8,7 +8,7 @@ public interface InterfaceAndroidFireBase {
     void writePlayerData(Avatar player);
     void writePartyData(Avatar player);
     void waitForMyMessages();
-    void waitForPlayers();
+    void waitForPlayers(String party);
     void finishAndRemoveTask();
     void signIn(String email,String username);
 }
