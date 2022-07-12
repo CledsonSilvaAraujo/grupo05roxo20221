@@ -71,10 +71,10 @@ public class SplashScreen implements Screen {
         this.splashImage.setHeight(Gdx.graphics.getHeight());
         this.tittle.setWidth(1000);
         this.tittle.setHeight(500);
-        this.tittle.setPosition(170,275);
+        this.tittle.setPosition(Gdx.graphics.getWidth()/2-500,Gdx.graphics.getHeight()-450);
         this.usuario.setWidth(93);
         this.usuario.setHeight(25);
-        this.usuario.setPosition(Gdx.graphics.getWidth()/2-200,Gdx.graphics.getHeight()/2+125);
+        this.usuario.setPosition(Gdx.graphics.getWidth()/2-200,Gdx.graphics.getHeight()/5+340);
         this.sala.setWidth(56);
         this.sala.setHeight(23);
         this.sala.setPosition(Gdx.graphics.getWidth()/2-200,Gdx.graphics.getHeight()/8+220);
