@@ -140,42 +140,41 @@ public class AndroidInterfaceClass extends Activity implements InterfaceAndroidF
 
 	@Override
 	public void waitForPlayers(String party) {
-		DatabaseReference parties = referencia.child("parties");
+		DatabaseReference parties = referencia.child("parties").child(party);
 		DatabaseReference players = referencia.child("players");
 
-		Query playerCreationQuery = parties.equalTo(party);
-		Query playerUpdateQuery = players.orderByChild("gameState").equalTo("PLAYING");
+		//Query playerCreationQuery = parties.oderByChild(party);
+		Query playerUpdateQuery = players.orderByChild("party").equalTo(party);
 
 		ValueEventListener onlinePlayersCreation = new ValueEventListener() {
 			@Override
 			public void onDataChange(DataSnapshot dataSnapshot) {
 
-				for (DataSnapshot zoneSnapshot : dataSnapshot.getChildren()) {
+				for (DataSnapshot player : dataSnapshot.getChildren()) {
 					if (AndroidInterfaceClass.gameLibGDX == null) return;
 
-					for (DataSnapshot player : zoneSnapshot.getChildren()) {
-						if (AndroidInterfaceClass.DEVICE_ID.equals(player.getKey())) continue;
+					if (AndroidInterfaceClass.DEVICE_ID.equals(player.getKey())) continue;
 
-						Log.d(TAG, "on data creation for " + player.getKey());
+					Log.d(TAG, "on data creation for " + player.getKey());
 
-						String cmd = (String) player.child("cmd").getValue();
+					String cmd = (String) player.child("cmd").getValue();
+					System.out.println("essa é a menssagem "+cmd);
+					Dictionary<String,String> dic = getCmdDictionary(cmd);
 
-						Dictionary<String,String> dic = getCmdDictionary(cmd);
+					World.world.createOnlinePlayer(
+						player.getKey(),
+						Float.parseFloat(dic.get("px")),
+						Float.parseFloat(dic.get("py"))
+					);
 
-						World.world.createOnlinePlayer(
-							player.getKey(),
-							Float.parseFloat(dic.get("px")),
-							Float.parseFloat(dic.get("py"))
-						);
+					AndroidInterfaceClass.gameLibGDX.enqueueMessage(
+						InterfaceLibGDX.ALL_PLAYERS_DATA,
+						null,
+						AndroidInterfaceClass.DEVICE_ID,
+						cmd,
+						null
+					);
 
-						AndroidInterfaceClass.gameLibGDX.enqueueMessage(
-							InterfaceLibGDX.ALL_PLAYERS_DATA,
-							null,
-							AndroidInterfaceClass.DEVICE_ID,
-							cmd,
-							null
-						);
-					}
 				}
 			}
 
@@ -212,7 +211,7 @@ public class AndroidInterfaceClass extends Activity implements InterfaceAndroidF
 			}
 		};
 
-		playerCreationQuery.addValueEventListener(onlinePlayersCreation);
+		parties.addValueEventListener(onlinePlayersCreation);
 		playerUpdateQuery.addValueEventListener(onlinePlayersUpdate);
 	}
 
