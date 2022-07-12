@@ -139,11 +139,11 @@ public class AndroidInterfaceClass extends Activity implements InterfaceAndroidF
 	}
 
 	@Override
-	public void waitForPlayers(String party){
+	public void waitForPlayers(String party) {
 		DatabaseReference parties = referencia.child("parties");
 		DatabaseReference players = referencia.child("players");
 
-		Query playerCreationQuery = parties.orderByChild(party).equalTo(party);
+		Query playerCreationQuery = parties.equalTo(party);
 		Query playerUpdateQuery = players.orderByChild("gameState").equalTo("PLAYING");
 
 		ValueEventListener onlinePlayersCreation = new ValueEventListener() {
