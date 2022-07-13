@@ -3,6 +3,7 @@ package br.uff.ic.lek.actors;
 import br.uff.ic.lek.PlayerData;
 import br.uff.ic.lek.game.World;
 import br.uff.ic.lek.screens.SplashScreen;
+import br.uff.ic.lek.utils.PathPlanning;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Peripheral;

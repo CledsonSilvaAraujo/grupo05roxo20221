@@ -131,11 +131,11 @@ public class WorldController implements InputProcessor {
 
 		System.out.println("move request!");
 
-		Vector3 target = new Vector3(screenX, screenY, 0);
+		Vector3 cameraTarget = new Vector3(screenX, screenY, 0);
 
-		this.camera.unproject(target);
-		this.world.setMainPlayerTarget(target);
+		this.camera.unproject(cameraTarget);
 		this.world.pathPlan.targetChanged(screenX, screenY);
+		this.world.setMainPlayerTarget(this.world.pathPlan.getTarget()==null?cameraTarget:this.world.pathPlan.getTarget());
 		fezTouchDown = false;
 		return false;
 	}

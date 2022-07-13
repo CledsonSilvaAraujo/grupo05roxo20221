@@ -194,6 +194,9 @@ public class PathPlanning {
 		int nodeCount = path.getCount();
 		for (int i = 0; i < nodeCount; i++) {
 			FlatTiledNode node = path.nodes.get(i);
+			System.out.println("Valor de X "+node.x);
+			System.out.println("Valor de Y "+node.y);
+			System.out.println("Valor de XWidth "+tileWidth);
 			renderer.rect(node.x * tileWidth, node.y * tileWidth, tileWidth/2, tileHeight/2);
 		}
 
@@ -214,6 +217,13 @@ public class PathPlanning {
 		renderer.end();
 	}
 
+	public Vector3 getTarget(){
+		if(path.getCount()==0)return null;
+		return new Vector3(path.nodes.get(path.getCount()-1).x*32,path.nodes.get(path.getCount()-1).y*32,0);
+	}
+	public void pop(){
+		path.nodes.pop();
+	}
 	public void dispose() {
 		renderer.dispose();
 		worldMap = null;

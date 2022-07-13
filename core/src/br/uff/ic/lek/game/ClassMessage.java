@@ -30,19 +30,15 @@ public class ClassMessage {
     }
 
     public static Object decodeCurrentPos(String json){
-        System.out.println("testing again");
         Json jsonParser = new Json();
-        System.out.println("testing again 1");
 
         jsonParser.setTypeName("class");
         jsonParser.setUsePrototypes(false);
         jsonParser.setIgnoreUnknownFields(true);
         jsonParser.setOutputType(JsonWriter.OutputType.json);
         jsonParser.addClassTag("ClassMessage", ClassMessage.class);
-        System.out.println("testing again 2");
 
         Object obj = jsonParser.fromJson(ClassMessage.class, json);
-        System.out.println("testing again 3");
 
         return obj;
     }

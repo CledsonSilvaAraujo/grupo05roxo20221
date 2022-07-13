@@ -85,17 +85,13 @@ public class SplashScreen implements Screen {
         btnLogin.setPosition(Gdx.graphics.getWidth()/2-200,Gdx.graphics.getHeight()/9.5f);
         btnLogin.setSize(400,100);
 
-
         username= new TextField("",skin);
         username.setPosition(Gdx.graphics.getWidth()/2-200,Gdx.graphics.getHeight()/5+240);
         username.setSize(400,100);
 
-
         party= new TextField("",skin);
         party.setPosition(Gdx.graphics.getWidth()/2-200,Gdx.graphics.getHeight()/8+120);
         party.setSize(400,100);
-        ;
-
         this.stage.addActor(splashImage);
         this.stage.addActor(tittle);
         stage.addActor(sala);
@@ -109,7 +105,6 @@ public class SplashScreen implements Screen {
             public void touchUp(InputEvent e, float x, float y, int point, int button){
                 USER=username.getText();
                 PARTY=party.getText();
-                System.out.println("esse é o ususario: "+USER+ " essa é a sala: "+ PARTY);
                 criamundo();
             }
         });
@@ -118,18 +113,14 @@ public class SplashScreen implements Screen {
 
     }
     public void criamundo(){
-        this.stage.addActor(splashImage); // adds the image as an actor to the stage
-
         this.splashImage.addAction(
                 Actions.sequence(
                         Actions.alpha(0.0f),
-                        Actions.fadeIn(1.0f),  // Actions.fadeOut(1.0f),
+                        Actions.fadeIn(1.0f),
                         Actions.run(new Runnable() { //Actions.delay(1) Actions.alpha(0.0f),
                                         @Override
                                         public void run() {
-
-                                            World.load();	// leva um tempo para carregar. Enquanto isso splash esta sendo exibido
-                                            //Gdx.app.log(" ", " carregando!");
+                                            World.load();
                                         }
                                     }
                         ),

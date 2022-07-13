@@ -158,7 +158,6 @@ public class AndroidInterfaceClass extends Activity implements InterfaceAndroidF
 					Log.d(TAG, "on data creation for " + player.getKey());
 
 					String cmd = (String) player.child("cmd").getValue();
-					System.out.println("essa é a menssagem "+cmd);
 					Dictionary<String,String> dic = getCmdDictionary(cmd);
 
 					World.world.createOnlinePlayer(
