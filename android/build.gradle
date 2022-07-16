@@ -31,11 +31,35 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             multiDexEnabled true
             signingConfig signingConfigs.debug
         }
+        applicationVariants.all {
+            variant ->
+                variant.outputs.each {
+                    output ->
+                        project.ext { appName = 'roxo20221' }
+                        def newName = output.outputFile.name
+                        newName = newName.replace("android", "$project.ext.appName")
+                        newName = newName.replace("-release", "_rel")
+                        output.outputFileName = newName
+                }
+        }
+
+        applicationVariants.all{
+            variant ->
+                variant.outputs.each{
+                    output->
+                        project.ext { appName = 'roxo20221' }
+                        def newName = output.outputFile.name
+                        newName = newName.replace("android", "$project.ext.appName")
+                        newName = newName.replace("-debug", "_deb")
+                        output.outputFileName = newName
+                }
+        }
+
     }
 }
 

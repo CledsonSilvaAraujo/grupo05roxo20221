@@ -102,11 +102,11 @@ public class ClassHud implements InputProcessor, Disposable{
         FreeTypeFontParameter parameter = new FreeTypeFontParameter();
         float correcao =Gdx.graphics.getDensity(); // Gdx.graphics.getDensity(); //Gdx.graphics.getWidth()/1920.0f; //Gdx.graphics.getDensity()*
         parameter.characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-+()[]_^";
-        parameter.size = (int)(16f * correcao);
+        parameter.size = (int)(8f * correcao);
         fontSmall = generator.generateFont(parameter);
-        parameter.size = (int)(32f * correcao);
+        parameter.size = (int)(16f * correcao);
         fontMedium = generator.generateFont(parameter);
-        parameter.size = (int)(64f * correcao);
+        parameter.size = (int)(32f * correcao);
         fontLarge = generator.generateFont(parameter);
         generator.dispose();
 
